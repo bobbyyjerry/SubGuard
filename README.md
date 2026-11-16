@@ -25,6 +25,21 @@ The **Dashboard** shows your saved subscriptions, monthly and annual estimates b
 Open **Analytics** for monthly and annual spending by category. When available, use the currency buttons to switch between estimates.
 Open **Calendar** to browse upcoming renewal dates and free-trial endings by month.
 
+## Email reminders
+
+Set `MAIL_SERVER` and `MAIL_DEFAULT_SENDER` in `.env` using your SMTP provider's settings. Set `MAIL_USERNAME` and `MAIL_PASSWORD` if your relay requires authentication. The default is STARTTLS on port 587. Use `MAIL_SECURITY=ssl` for implicit TLS (port 465 by default) or `MAIL_SECURITY=none` for a local test relay without credentials.
+
+Run this in an activated virtual environment. Keep the reminder worker running in its own terminal alongside the web app.
+
+```powershell
+flask init-db
+flask reminders
+```
+
+The worker checks every 15 minutes and sends one reminder per saved subscription date, starting three days before the renewal or trial end. Set `REMINDER_DAYS` to change the lead time for the app. The first check runs at startup and catches upcoming events still inside the window. To check once and exit, use `flask reminders --once`.
+
+The database records each handoff. The worker retries messages that SMTP definitively rejects and logs unconfirmed handoffs for review to avoid duplicate sends.
+
 ## Run the tests
 
 ```powershell

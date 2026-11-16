@@ -1,5 +1,5 @@
 """Database models for SubGuard."""
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 from flask_login import UserMixin
@@ -59,6 +59,15 @@ class Subscription(db.Model):
     @property
     def converts_to_paid(self):
         return self.subscription_type == "trial_converts"
+
+
+class ReminderDelivery(db.Model):
+    __tablename__ = "reminder_deliveries"
+
+    subscription_id: Mapped[int] = mapped_column(ForeignKey("subscriptions.id", ondelete="CASCADE"), primary_key=True)
+    event_date: Mapped[date] = mapped_column(primary_key=True)
+    claimed_at: Mapped[datetime]
+    sent_at: Mapped[datetime | None]
 
 
 @login_manager.user_loader

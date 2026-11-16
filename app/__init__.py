@@ -61,6 +61,10 @@ def create_app(config_name=None):
     app.register_blueprint(analytics_bp)
     app.register_blueprint(calendar_bp)
 
+    from .reminder_cli import reminders_command
+
+    app.cli.add_command(reminders_command)
+
     @app.cli.command("init-db")
     def init_db():
         """Create any missing database tables."""
