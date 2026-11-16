@@ -53,7 +53,7 @@ def index():
 @bp.route("/new", methods=["GET", "POST"])
 @login_required
 def add():
-    form = SubscriptionForm()
+    form = SubscriptionForm(currency=current_user.preferred_currency)
     if form.validate_on_submit():
         values = _form_values(form)
         db.session.add(Subscription(

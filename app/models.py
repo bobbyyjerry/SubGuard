@@ -1,4 +1,6 @@
 """Database models for SubGuard."""
+import hashlib
+import hmac
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -16,6 +18,8 @@ class UserPreferences(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     time_zone: Mapped[str] = mapped_column(String(128))
     reminder_days: Mapped[int | None]
+    # Preferred currency: the default for new subscriptions and the one shown first.
+    currency: Mapped[str | None] = mapped_column(String(3))
 
 
 class User(UserMixin, db.Model):
@@ -31,6 +35,18 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @property
+    def preferred_currency(self):
+        return self.preferences.currency if self.preferences else None
+
+    def _session_stamp(self):
+        return hashlib.sha256(self.password_hash.encode()).hexdigest()[:16]
+
+    def get_id(self):
+        # The login session carries a fingerprint of the password hash, so
+        # changing the password signs out every other browser and device.
+        return f"{self.id}:{self._session_stamp()}"
 
 
 class Subscription(db.Model):
@@ -84,7 +100,11 @@ class ReminderDelivery(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
+    identifier, _, stamp = str(user_id).partition(":")
     try:
-        return db.session.get(User, int(user_id))
+        user = db.session.get(User, int(identifier))
     except ValueError:
         return None
+    if user is None or not hmac.compare_digest(stamp, user._session_stamp()):
+        return None
+    return user

@@ -23,7 +23,8 @@ def index():
 
     currency = request.args.get("currency")
     if currency not in currencies:
-        currency = "USD" if "USD" in currencies else next(iter(currencies), None)
+        fallbacks = (current_user.preferred_currency, "USD", *currencies)
+        currency = next((code for code in fallbacks if code in currencies), None)
 
     category_totals = totals.get(currency, {})
     categories = [

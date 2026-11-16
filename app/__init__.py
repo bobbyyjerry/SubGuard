@@ -72,10 +72,15 @@ def create_app(config_name=None):
         """Create any missing database tables and columns."""
         db.create_all()
         # create_all() never changes existing tables, so add newer columns here.
-        columns = {column["name"] for column in db.inspect(db.engine).get_columns("subscriptions")}
-        if "billing_anchor_date" not in columns:
-            with db.engine.begin() as connection:
-                connection.execute(db.text("ALTER TABLE subscriptions ADD COLUMN billing_anchor_date DATE"))
+        newer_columns = (
+            ("subscriptions", "billing_anchor_date", "DATE"),
+            ("user_preferences", "currency", "VARCHAR(3)"),
+        )
+        for table, name, column_type in newer_columns:
+            existing = {column["name"] for column in db.inspect(db.engine).get_columns(table)}
+            if name not in existing:
+                with db.engine.begin() as connection:
+                    connection.execute(db.text(f"ALTER TABLE {table} ADD COLUMN {name} {column_type}"))
         click.echo("Database tables are ready.")
 
     # Friendly 404 / 500 pages.

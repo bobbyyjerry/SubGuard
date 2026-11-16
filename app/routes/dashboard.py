@@ -60,7 +60,8 @@ def index():
         subscriptions = Subscription.list_for_user(current_user.id)
 
     paid = active_paid_subscriptions(subscriptions)
-    monthly, annual = spending_totals(paid)
+    preferred = None if is_preview else current_user.preferred_currency
+    monthly, annual = spending_totals(paid, preferred)
     trials = sorted(
         (s for s in subscriptions if s.status == "active" and s.is_trial and s.trial_end_date >= today),
         key=lambda s: s.trial_end_date,

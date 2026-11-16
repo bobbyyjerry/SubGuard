@@ -24,7 +24,7 @@ After logging in, use **Subscriptions** to add and manage subscriptions or free 
 The **Dashboard** shows your saved subscriptions, monthly and annual estimates by currency, upcoming payments, and active free trials.
 Open **Analytics** for monthly and annual spending by category. When available, use the currency buttons to switch between estimates.
 Open **Calendar** to browse upcoming renewal dates and free-trial endings by month.
-Use **Settings** to choose your time zone and email reminder lead time, or turn reminders off. The default time zone is UTC.
+Use **Settings** to choose your time zone, preferred currency, and email reminder lead time, or turn reminders off. The default time zone is UTC. The preferred currency is selected first on new subscriptions and shown first in totals; amounts are never converted. You can also change your email address and password there. Both need your current password, and changing the password signs out your other devices.
 
 ## Email reminders
 

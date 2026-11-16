@@ -48,10 +48,12 @@ def cancellation_savings(subscriptions, today):
     return savings
 
 
-def spending_totals(paid_subscriptions):
-    """Return monthly and annual totals by currency for display."""
+def spending_totals(paid_subscriptions, first_currency=None):
+    """Return monthly and annual totals by currency for display, with `first_currency` leading."""
     by_currency = annual_spending_by_category(paid_subscriptions)
     annual = {currency: sum(categories.values()) for currency, categories in by_currency.items()}
+    if first_currency in annual:
+        annual = {first_currency: annual.pop(first_currency), **annual}
 
     monthly = {currency: total / 12 for currency, total in annual.items()}
     return monthly, annual

@@ -43,6 +43,29 @@ class RegistrationForm(LoginForm):
     )
 
 
+class EmailChangeForm(FlaskForm):
+    email = EmailField(
+        "Email address",
+        filters=[normalize_email],
+        validators=[InputRequired(), Length(max=254), Email()],
+        description="Reminder emails are sent to this address. You also use it to log in.",
+    )
+    password = PasswordField("Current password", validators=[InputRequired(), Length(max=128)])
+
+
+class PasswordChangeForm(FlaskForm):
+    current_password = PasswordField("Current password", validators=[InputRequired(), Length(max=128)])
+    new_password = PasswordField(
+        "New password",
+        validators=[InputRequired(), Length(min=12, max=128)],
+        description="Use at least 12 characters.",
+    )
+    confirm_password = PasswordField(
+        "Confirm new password",
+        validators=[InputRequired(), Length(max=128), EqualTo("new_password", message="The passwords must match.")],
+    )
+
+
 def _strip(value):
     return value.strip() if value else value
 
@@ -62,6 +85,12 @@ class PreferencesForm(FlaskForm):
             SelectChoice("0", "Off"),
         ],
         description="Applies to both renewals and free-trial endings.",
+    )
+
+    currency = SelectField(
+        "Preferred currency",
+        choices=[SelectChoice(code, f"{code} ({symbol})") for code, symbol in CURRENCIES.items()],
+        description="Selected first when you add a subscription and shown first in totals. Amounts are never converted.",
     )
 
     def validate_time_zone(self, field):
