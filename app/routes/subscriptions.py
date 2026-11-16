@@ -5,6 +5,7 @@ from flask_login import current_user, login_required
 from ..extensions import db
 from ..forms import SubscriptionForm
 from ..models import Subscription
+from ..services.timezones import today_for_user
 
 bp = Blueprint("subscriptions", __name__, url_prefix="/subscriptions")
 
@@ -43,7 +44,9 @@ def _apply_change(statement, subscription_id, message):
 @login_required
 def index():
     subscriptions = Subscription.list_for_user(current_user.id)
-    return render_template("subscriptions/index.html", subscriptions=subscriptions, is_preview=False)
+    return render_template(
+        "subscriptions/index.html", subscriptions=subscriptions, is_preview=False, today=today_for_user(current_user),
+    )
 
 
 @bp.route("/new", methods=["GET", "POST"])

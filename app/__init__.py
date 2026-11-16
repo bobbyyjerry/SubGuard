@@ -52,6 +52,7 @@ def create_app(config_name=None):
     from .routes.calendar import bp as calendar_bp
     from .routes.dashboard import bp as dashboard_bp
     from .routes.main import bp as main_bp
+    from .routes.settings import bp as settings_bp
     from .routes.subscriptions import bp as subscriptions_bp
 
     app.register_blueprint(main_bp)
@@ -60,6 +61,7 @@ def create_app(config_name=None):
     app.register_blueprint(subscriptions_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(calendar_bp)
+    app.register_blueprint(settings_bp)
 
     from .reminder_cli import reminders_command
 

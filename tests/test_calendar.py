@@ -1,16 +1,13 @@
 """Calendar navigation and private, upcoming subscription dates."""
-from datetime import date
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from app.extensions import db
 from app.models import Subscription, User
-from app.routes import calendar
+from app.services import timezones
 
 
-class FixedDate(date):
-    @classmethod
-    def today(cls):
-        return cls(2026, 12, 28)
+NOW = datetime(2026, 12, 28, 12, tzinfo=timezone.utc)
 
 
 def _register(client, email):
@@ -33,11 +30,11 @@ def test_calendar_requires_login(client):
 
 
 def test_calendar_groups_upcoming_renewals_and_trials_for_one_account(app, client, monkeypatch):
-    monkeypatch.setattr(calendar, "date", FixedDate)
+    monkeypatch.setattr(timezones, "utc_now", lambda: NOW)
     _register(client, "owner@example.com")
     other_client = app.test_client()
     _register(other_client, "other@example.com")
-    today = FixedDate.today()
+    today = NOW.date()
     with app.app_context():
         owner = db.session.scalar(db.select(User.id).filter_by(email="owner@example.com"))
         other = db.session.scalar(db.select(User.id).filter_by(email="other@example.com"))
@@ -90,7 +87,7 @@ def test_calendar_groups_upcoming_renewals_and_trials_for_one_account(app, clien
 
 
 def test_calendar_handles_empty_and_unavailable_months(client, monkeypatch):
-    monkeypatch.setattr(calendar, "date", FixedDate)
+    monkeypatch.setattr(timezones, "utc_now", lambda: NOW)
     _register(client, "owner@example.com")
     for month in ("invalid", "2026-13", "2026-11"):
         response = client.get(f"/calendar/?month={month}")

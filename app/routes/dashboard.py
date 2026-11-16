@@ -1,5 +1,5 @@
 """Personal dashboard for signed-in users and a public sample dashboard."""
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 
@@ -8,6 +8,7 @@ from flask_login import current_user
 
 from ..models import Subscription
 from ..services.billing import active_paid_subscriptions, spending_totals
+from ..services.timezones import today_for_user
 
 bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
@@ -49,7 +50,7 @@ def _sample_subscriptions(today):
 
 @bp.get("/")
 def index():
-    today = date.today()
+    today = today_for_user(current_user)
     is_preview = not current_user.is_authenticated
     if is_preview:
         subscriptions = _sample_subscriptions(today)

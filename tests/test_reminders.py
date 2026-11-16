@@ -1,5 +1,5 @@
 """Reminder selection, SMTP outcomes, and duplicate prevention."""
-from datetime import date, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from email.message import EmailMessage
 import smtplib
@@ -8,11 +8,12 @@ from unittest.mock import Mock
 import pytest
 
 from app.extensions import db
-from app.models import ReminderDelivery, Subscription, User
+from app.models import ReminderDelivery, Subscription, User, UserPreferences
 from app.services import mail, reminders
 
 
-TODAY = date(2026, 11, 16)
+NOW = datetime(2026, 11, 16, 12, tzinfo=timezone.utc)
+TODAY = NOW.date()
 SETTINGS = mail.MailSettings("127.0.0.1", 1025, "none", "SubGuard <reminders@example.com>")
 
 
@@ -50,8 +51,8 @@ def test_sends_one_reminder_per_upcoming_active_date(app, monkeypatch):
         ])
         db.session.commit()
 
-        assert reminders.send_due_reminders(SETTINGS, 3, today=TODAY) == (3, 0)
-        assert reminders.send_due_reminders(SETTINGS, 3, today=TODAY) == (0, 0)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=NOW) == (3, 0)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=NOW) == (0, 0)
         assert [str(message["To"]) for message in delivered] == [
             "other@example.com", "owner@example.com", "owner@example.com",
         ]
@@ -63,7 +64,7 @@ def test_sends_one_reminder_per_upcoming_active_date(app, monkeypatch):
 
         renewal.next_renewal_date = TODAY + timedelta(days=2)
         db.session.commit()
-        assert reminders.send_due_reminders(SETTINGS, 3, today=TODAY) == (1, 0)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=NOW) == (1, 0)
         assert "Streaming service renews on 18 Nov 2026." in delivered[-1].get_content()
 
 
@@ -79,12 +80,46 @@ def test_rejected_mail_retries_but_unconfirmed_handoff_is_held(app, monkeypatch)
         db.session.add_all([retry, unknown])
         db.session.commit()
 
-        assert reminders.send_due_reminders(SETTINGS, 3, today=TODAY) == (0, 2)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=NOW) == (0, 2)
         assert db.session.get(ReminderDelivery, (retry.id, retry.next_renewal_date)) is None
         assert db.session.get(ReminderDelivery, (unknown.id, unknown.next_renewal_date)).sent_at is None
-        assert reminders.send_due_reminders(SETTINGS, 3, today=TODAY) == (1, 0)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=NOW) == (1, 0)
         assert "Definitively rejected" in smtp.call_args.args[1].get_content()
-        assert reminders.send_due_reminders(SETTINGS, 3, today=TODAY) == (0, 0)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=NOW) == (0, 0)
+
+
+def test_reminder_uses_local_date_and_account_lead_time(app, monkeypatch):
+    delivered = []
+    monkeypatch.setattr(reminders, "deliver", lambda settings, message: delivered.append(str(message["To"])))
+    with app.app_context():
+        for account, zone, preferred_days, due_in in [
+            ("shanghai", "Asia/Shanghai", None, 4),
+            ("los-angeles", "America/Los_Angeles", None, 4),
+            ("seven-days", "UTC", 7, 7),
+            ("one-day", "UTC", 1, 2),
+            ("reminders-off", "UTC", 0, 2),
+        ]:
+            user = User(email=f"{account}@example.com", password_hash="unused")
+            db.session.add(user)
+            db.session.flush()
+            db.session.add(UserPreferences(user_id=user.id, time_zone=zone, reminder_days=preferred_days))
+            subscription = _subscription(user, account, due_in)
+            db.session.add(subscription)
+            db.session.flush()
+            if preferred_days == 0:
+                disabled_id = subscription.id
+        db.session.commit()
+
+        # Shanghai is already on the next calendar day.
+        evening_utc = NOW + timedelta(hours=9)
+        assert reminders.send_due_reminders(SETTINGS, 3, now=evening_utc) == (2, 0)
+        assert set(delivered) == {"shanghai@example.com", "seven-days@example.com"}
+
+        next_day_utc = NOW + timedelta(days=1)
+        delivered.clear()
+        assert reminders.send_due_reminders(SETTINGS, 3, now=next_day_utc) == (2, 0)
+        assert set(delivered) == {"los-angeles@example.com", "one-day@example.com"}
+        assert not reminders._claim(disabled_id, TODAY + timedelta(days=2))
 
 
 def test_claim_is_unique_and_checks_latest_subscription_state(app):

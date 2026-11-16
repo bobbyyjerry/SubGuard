@@ -8,7 +8,7 @@ from flask.cli import with_appcontext
 from sqlalchemy import inspect
 
 from .extensions import db
-from .models import ReminderDelivery
+from .models import ReminderDelivery, UserPreferences
 from .services.mail import MailSettings
 from .services.reminders import send_due_reminders
 
@@ -36,8 +36,9 @@ def reminders_command(once):
         lead_days = 0
     if not 1 <= lead_days <= 30:
         raise click.ClickException("REMINDER_DAYS must be an integer from 1 to 30.")
-    if not inspect(db.engine).has_table(ReminderDelivery.__tablename__):
-        raise click.ClickException("Run flask init-db to create the reminder delivery table.")
+    schema = inspect(db.engine)
+    if not all(schema.has_table(model.__tablename__) for model in (ReminderDelivery, UserPreferences)):
+        raise click.ClickException("Run flask init-db to create the reminder and preference tables.")
 
     if once:
         if _scan(app, settings, lead_days):
@@ -55,7 +56,7 @@ def reminders_command(once):
         max_instances=1,
         misfire_grace_time=900,
     )
-    click.echo(f"Checking for reminders every 15 minutes with a {lead_days}-day reminder window.")
+    click.echo(f"Checking for reminders every 15 minutes. The default lead time is {lead_days} days.")
     try:
         scheduler.start()
     except KeyboardInterrupt:

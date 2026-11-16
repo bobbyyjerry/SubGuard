@@ -11,9 +11,11 @@ from .constants import (
     CATEGORIES,
     CURRENCIES,
     MAX_SUBSCRIPTION_PRICE,
+    REMINDER_LEAD_TIMES,
     SUBSCRIPTION_TYPES,
     ZERO_DECIMAL_CURRENCIES,
 )
+from .services.timezones import time_zone_names
 
 
 def normalize_email(value):
@@ -43,6 +45,28 @@ class RegistrationForm(LoginForm):
 
 def _strip(value):
     return value.strip() if value else value
+
+
+class PreferencesForm(FlaskForm):
+    time_zone = StringField(
+        "Time zone",
+        filters=[_strip],
+        validators=[DataRequired(), Length(max=128)],
+        description="Choose a city or region, such as Asia/Shanghai. Calendar and reminder dates use this time zone.",
+    )
+    reminder_days = SelectField(
+        "Email reminders",
+        choices=[
+            SelectChoice("default", "Use app default"),
+            *(SelectChoice(str(days), f"{days} {'day' if days == 1 else 'days'} before") for days in REMINDER_LEAD_TIMES),
+            SelectChoice("0", "Off"),
+        ],
+        description="Applies to both renewals and free-trial endings.",
+    )
+
+    def validate_time_zone(self, field):
+        if field.data not in time_zone_names():
+            raise ValidationError("Choose a time zone from the list.")
 
 
 class SubscriptionForm(FlaskForm):

@@ -4,10 +4,18 @@ from decimal import Decimal
 
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey, Numeric, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .extensions import db, login_manager
+
+
+class UserPreferences(db.Model):
+    __tablename__ = "user_preferences"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    time_zone: Mapped[str] = mapped_column(String(128))
+    reminder_days: Mapped[int | None]
 
 
 class User(UserMixin, db.Model):
@@ -16,6 +24,7 @@ class User(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))
+    preferences: Mapped[UserPreferences | None] = relationship()
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

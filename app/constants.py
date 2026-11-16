@@ -32,6 +32,7 @@ SUBSCRIPTION_TYPES = {
 }
 
 MAX_SUBSCRIPTION_PRICE = 9_999_999
+REMINDER_LEAD_TIMES = (1, 3, 7)
 
 # key -> (display name, Bootstrap colour)
 STATUSES = {

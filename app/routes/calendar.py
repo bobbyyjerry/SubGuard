@@ -7,6 +7,7 @@ from flask_login import current_user, login_required
 
 from ..extensions import db
 from ..models import Subscription
+from ..services.timezones import today_for_user
 
 bp = Blueprint("calendar", __name__, url_prefix="/calendar")
 
@@ -23,7 +24,7 @@ def _requested_month(value, current_month):
 @bp.get("/")
 @login_required
 def index():
-    today = date.today()
+    today = today_for_user(current_user)
     current_month = today.replace(day=1)
     month = _requested_month(request.args.get("month"), current_month)
     month_end = month.replace(day=monthrange(month.year, month.month)[1])

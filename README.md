@@ -24,6 +24,7 @@ After logging in, use **Subscriptions** to add and manage subscriptions or free 
 The **Dashboard** shows your saved subscriptions, monthly and annual estimates by currency, upcoming payments, and active free trials.
 Open **Analytics** for monthly and annual spending by category. When available, use the currency buttons to switch between estimates.
 Open **Calendar** to browse upcoming renewal dates and free-trial endings by month.
+Use **Settings** to choose your time zone and email reminder lead time, or turn reminders off. The default time zone is UTC.
 
 ## Email reminders
 
@@ -36,7 +37,7 @@ flask init-db
 flask reminders
 ```
 
-The worker checks every 15 minutes and sends one reminder per saved subscription date, starting three days before the renewal or trial end. Set `REMINDER_DAYS` to change the lead time for the app. The first check runs at startup and catches upcoming events still inside the window. To check once and exit, use `flask reminders --once`.
+The worker checks every 15 minutes and sends one reminder per saved subscription date. It uses the account's local date and sends up to three days in advance by default. Set `REMINDER_DAYS` to change the app default. Users can choose 1, 3, or 7 days in **Settings** or turn off reminders for their account. The first check runs at startup and catches upcoming events still inside the window. To check once and exit, use `flask reminders --once`.
 
 The database records each handoff. The worker retries messages that SMTP definitively rejects and logs unconfirmed handoffs for review to avoid duplicate sends.
 

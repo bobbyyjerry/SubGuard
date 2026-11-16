@@ -1,17 +1,14 @@
 """Personal dashboard totals, date windows, and account isolation."""
 import re
-from datetime import date, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from app.extensions import db
 from app.models import Subscription, User
-from app.routes import dashboard
+from app.services import timezones
 
 
-class FixedDate(date):
-    @classmethod
-    def today(cls):
-        return cls(2026, 11, 16)
+NOW = datetime(2026, 11, 16, 12, tzinfo=timezone.utc)
 
 
 def _register(client, email):
@@ -31,7 +28,7 @@ def _subscription(user_id, name, price, days, **overrides):
         user_id=user_id,
         name=name,
         price=Decimal(price),
-        next_renewal_date=FixedDate.today() + timedelta(days=days),
+        next_renewal_date=NOW.date() + timedelta(days=days),
         **values,
     )
 
@@ -41,7 +38,7 @@ def _section(html, heading_id):
 
 
 def test_dashboard_uses_only_the_signed_in_users_records(app, client, monkeypatch):
-    monkeypatch.setattr(dashboard, "date", FixedDate)
+    monkeypatch.setattr(timezones, "utc_now", lambda: NOW)
     _register(client, "owner@example.com")
     other_client = app.test_client()
     _register(other_client, "other@example.com")
@@ -100,7 +97,8 @@ def test_dashboard_uses_only_the_signed_in_users_records(app, client, monkeypatc
     assert "Other account subscription" not in guest_html
 
 
-def test_dashboard_updates_after_a_subscription_is_saved_paused_and_deleted(app, client):
+def test_dashboard_updates_after_a_subscription_is_saved_paused_and_deleted(app, client, monkeypatch):
+    monkeypatch.setattr(timezones, "utc_now", lambda: NOW)
     _register(client, "owner@example.com")
     empty = client.get("/dashboard/").get_data(as_text=True)
     assert "Add a subscription or free trial to see it here." in empty
@@ -112,7 +110,7 @@ def test_dashboard_updates_after_a_subscription_is_saved_paused_and_deleted(app,
         "price": "18.27",
         "currency": "USD",
         "billing_cycle": "monthly",
-        "next_renewal_date": date.today().isoformat(),
+        "next_renewal_date": NOW.date().isoformat(),
         "category": "other",
         "subscription_type": "paid",
     })

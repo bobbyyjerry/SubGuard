@@ -1,15 +1,17 @@
 """Find upcoming events and send at most one reminder per saved date."""
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from email.utils import format_datetime, make_msgid
 
 from flask import current_app
 from sqlalchemy.exc import IntegrityError
 
+from ..constants import REMINDER_LEAD_TIMES
 from ..extensions import db
-from ..models import ReminderDelivery, Subscription, User
+from ..models import ReminderDelivery, Subscription, User, UserPreferences
 from ..template_helpers import cycle_suffix, money, nice_date
 from .mail import MailRejected, MailUnconfirmed, deliver
+from .timezones import local_date, utc_now
 
 
 def _message(subscription, email, sender):
@@ -38,12 +40,17 @@ def _message(subscription, email, sender):
 
 
 def _claim(subscription_id, event_date):
+    opted_out = db.select(UserPreferences.user_id).where(
+        UserPreferences.user_id == Subscription.user_id,
+        UserPreferences.reminder_days == 0,
+    ).exists()
     eligible = db.select(
         Subscription.id, Subscription.next_renewal_date, db.literal(datetime.now(timezone.utc)),
     ).where(
         Subscription.id == subscription_id,
         Subscription.next_renewal_date == event_date,
         Subscription.status == "active",
+        ~opted_out,
     )
     claim = db.insert(ReminderDelivery).from_select(
         ["subscription_id", "event_date", "claimed_at"], eligible,
@@ -59,27 +66,34 @@ def _claim(subscription_id, event_date):
     return result.rowcount == 1
 
 
-def send_due_reminders(settings, lead_days, *, today=None):
-    """Check dates one to lead_days days away and return sent and failed counts."""
-    today = today or date.today()
+def send_due_reminders(settings, lead_days, *, now=None):
+    """Check each account's local reminder window and return sent and failed counts."""
+    now = utc_now() if now is None else now
+    utc_date = now.astimezone(timezone.utc).date()
+    # An account's local date can be one day ahead of or behind UTC.
+    latest_date = utc_date + timedelta(days=max(lead_days, *REMINDER_LEAD_TIMES) + 1)
     already_claimed = db.select(ReminderDelivery.subscription_id).where(
         ReminderDelivery.subscription_id == Subscription.id,
         ReminderDelivery.event_date == Subscription.next_renewal_date,
     ).exists()
     upcoming = (
-        db.select(Subscription, User.email)
+        db.select(Subscription, User.email, UserPreferences.time_zone, UserPreferences.reminder_days)
         .join(User, User.id == Subscription.user_id)
+        .outerjoin(UserPreferences, UserPreferences.user_id == User.id)
         .where(
             Subscription.status == "active",
-            Subscription.next_renewal_date.between(today + timedelta(days=1), today + timedelta(days=lead_days)),
+            Subscription.next_renewal_date.between(utc_date, latest_date),
             ~already_claimed,
         )
         .order_by(Subscription.next_renewal_date, Subscription.id)
     )
-    messages = [
-        (subscription.id, subscription.next_renewal_date, _message(subscription, email, settings.sender))
-        for subscription, email in db.session.execute(upcoming)
-    ]
+    messages = []
+    for subscription, email, time_zone, preferred_days in db.session.execute(upcoming):
+        days_before = lead_days if preferred_days is None else preferred_days
+        days_until = (subscription.next_renewal_date - local_date(time_zone, now=now)).days
+        if 1 <= days_until <= days_before:
+            message = _message(subscription, email, settings.sender)
+            messages.append((subscription.id, subscription.next_renewal_date, message))
 
     sent = failed = 0
     for subscription_id, event_date, message in messages:

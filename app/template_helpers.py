@@ -2,7 +2,6 @@
 
 Filters are used with a pipe:   {{ sub.price | money(sub.currency) }}
 """
-from datetime import date
 from decimal import Decimal
 
 from .constants import (
@@ -67,8 +66,3 @@ def register_template_helpers(app):
         BILLING_CYCLES=BILLING_CYCLES,
         STATUSES=STATUSES,
     )
-
-    @app.context_processor
-    def inject_today():
-        # Calculated per request. Day 9 switches this to "today in the user's time zone".
-        return {"today": date.today()}
