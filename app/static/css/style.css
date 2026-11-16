@@ -1,43 +1,85 @@
 /* =========================================================
-   SubGuard styles: small custom layer on top of Bootstrap 5.
-   All colours are defined once as variables ("design tokens")
-   so the whole look can be changed in one place.
+   SubGuard styles: a small custom layer on top of Bootstrap 5.
+   Theme: MIDNIGHT NAVY + ELECTRIC CYAN (dark).
+
+   base.html sets <html data-bs-theme="dark">, so Bootstrap's own
+   components (dropdowns, modals, form fields, close buttons) use
+   their dark versions. Below we swap Bootstrap's default greys for
+   our navy palette and its blue for our cyan.
+
+   All colours live in the variables in the first block
+   ("design tokens"), so the whole look changes in one place.
    ========================================================= */
 
-:root {
-  /* Brand */
-  --sg-primary: #4f46e5;          /* indigo */
-  --sg-primary-hover: #4338ca;
-  --sg-primary-soft: #eef2ff;
+:root,
+:root[data-bs-theme="dark"] {
+  color-scheme: dark;
 
-  /* Surfaces and text */
-  --sg-bg: #f6f7fb;
-  --sg-surface: #ffffff;
-  --sg-border: #e6e8ef;
-  --sg-text: #111827;
-  --sg-muted: #6b7280;
+  /* ---- Brand: electric cyan ---- */
+  --sg-primary: #22d3ee;           /* electric cyan */
+  --sg-primary-hover: #67e8f9;     /* lighter cyan for hover */
+  --sg-primary-deep: #0ea5e9;      /* deeper cyan-blue for gradients */
+  --sg-primary-soft: rgba(34, 211, 238, 0.12);
+  --sg-primary-line: rgba(34, 211, 238, 0.35);
+  --sg-glow: 0 0 0 1px rgba(34, 211, 238, 0.35), 0 8px 28px rgba(34, 211, 238, 0.25);
+  --sg-on-primary: #04111f;        /* text on cyan: near-black navy */
 
-  /* Status colours */
-  --sg-success: #059669;
-  --sg-success-soft: #ecfdf5;
-  --sg-warning: #d97706;
-  --sg-warning-soft: #fffbeb;
-  --sg-danger: #dc2626;
-  --sg-danger-soft: #fef2f2;
+  /* ---- Surfaces: midnight navy ---- */
+  --sg-bg: #070d1f;                /* page background */
+  --sg-bg-deep: #050a18;           /* footer, deepest areas */
+  --sg-surface: #0d1630;           /* cards */
+  --sg-surface-2: #131e3e;         /* raised: dropdowns, hover */
+  --sg-input-bg: #0a1228;          /* form fields (slightly inset) */
+  --sg-input-border: #2c3d6e;      /* brighter than card borders so fields stand out */
+  --sg-border: #1e2b52;
+  --sg-text: #e6edf7;
+  --sg-muted: #8b9ab8;             /* ~6:1 contrast on cards */
+
+  /* ---- Status colours (tuned to read well on navy) ---- */
+  --sg-success: #34d399;
+  --sg-success-soft: rgba(52, 211, 153, 0.12);
+  --sg-warning: #fbbf24;
+  --sg-warning-soft: rgba(251, 191, 36, 0.12);
+  --sg-danger: #f87171;
+  --sg-danger-soft: rgba(248, 113, 113, 0.12);
 
   --sg-radius: 0.875rem;
-  --sg-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.06);
+  --sg-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
 
-  /* Feed our tokens into Bootstrap's own variables */
+  /* ---- Feed our tokens into Bootstrap's variables ---- */
   --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --bs-body-bg: var(--sg-bg);
+  --bs-body-bg-rgb: 7, 13, 31;
   --bs-body-color: var(--sg-text);
+  --bs-body-color-rgb: 230, 237, 247;
+  --bs-emphasis-color: #ffffff;
+  --bs-emphasis-color-rgb: 255, 255, 255;
+  --bs-heading-color: #f4f8ff;
   --bs-secondary-color: var(--sg-muted);
+  --bs-secondary-rgb: 139, 154, 184;      /* .text-secondary */
+  --bs-secondary-bg: var(--sg-surface-2);
+  --bs-tertiary-bg: var(--sg-surface);
   --bs-border-color: var(--sg-border);
+  --bs-border-color-translucent: rgba(148, 170, 220, 0.14);
+
   --bs-primary: var(--sg-primary);
-  --bs-primary-rgb: 79, 70, 229;
-  --bs-link-color-rgb: 79, 70, 229;
-  --bs-link-hover-color-rgb: 67, 56, 202;
+  --bs-primary-rgb: 34, 211, 238;
+  --bs-primary-text-emphasis: #a5f3fc;
+  --bs-primary-bg-subtle: rgba(34, 211, 238, 0.1);
+  --bs-primary-border-subtle: var(--sg-primary-line);
+  --bs-info-rgb: 34, 211, 238;
+  --bs-info-text-emphasis: #a5f3fc;
+  --bs-info-bg-subtle: rgba(34, 211, 238, 0.08);
+  --bs-info-border-subtle: rgba(34, 211, 238, 0.3);
+  --bs-success-rgb: 52, 211, 153;
+  --bs-warning-rgb: 251, 191, 36;
+  --bs-danger-rgb: 248, 113, 113;
+
+  --bs-link-color: var(--sg-primary);
+  --bs-link-color-rgb: 34, 211, 238;
+  --bs-link-hover-color: var(--sg-primary-hover);
+  --bs-link-hover-color-rgb: 103, 232, 249;
+  --bs-focus-ring-color: rgba(34, 211, 238, 0.35);
 }
 
 body {
@@ -45,56 +87,105 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::selection { background: rgba(34, 211, 238, 0.35); color: #fff; }
+
 /* ---------- Buttons ---------- */
 .btn { border-radius: 0.6rem; font-weight: 500; }
 
 .btn-primary {
+  --bs-btn-color: var(--sg-on-primary);
   --bs-btn-bg: var(--sg-primary);
   --bs-btn-border-color: var(--sg-primary);
+  --bs-btn-hover-color: var(--sg-on-primary);
   --bs-btn-hover-bg: var(--sg-primary-hover);
   --bs-btn-hover-border-color: var(--sg-primary-hover);
+  --bs-btn-active-color: var(--sg-on-primary);
   --bs-btn-active-bg: var(--sg-primary-hover);
   --bs-btn-active-border-color: var(--sg-primary-hover);
+  --bs-btn-disabled-color: var(--sg-on-primary);
   --bs-btn-disabled-bg: var(--sg-primary);
   --bs-btn-disabled-border-color: var(--sg-primary);
-  --bs-btn-focus-shadow-rgb: 79, 70, 229;
+  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+  font-weight: 600;
 }
+.btn-primary:hover { box-shadow: var(--sg-glow); }
 
 .btn-outline-primary {
   --bs-btn-color: var(--sg-primary);
-  --bs-btn-border-color: var(--sg-primary);
+  --bs-btn-border-color: var(--sg-primary-line);
+  --bs-btn-hover-color: var(--sg-on-primary);
   --bs-btn-hover-bg: var(--sg-primary);
   --bs-btn-hover-border-color: var(--sg-primary);
-  --bs-btn-active-bg: var(--sg-primary-hover);
-  --bs-btn-focus-shadow-rgb: 79, 70, 229;
+  --bs-btn-active-color: var(--sg-on-primary);
+  --bs-btn-active-bg: var(--sg-primary);
+  --bs-btn-active-border-color: var(--sg-primary);
+  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+}
+
+/* "Light" and "secondary" buttons become quiet navy buttons */
+.btn-light {
+  --bs-btn-color: var(--sg-text);
+  --bs-btn-bg: var(--sg-surface-2);
+  --bs-btn-border-color: var(--sg-border);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #1a2750;
+  --bs-btn-hover-border-color: var(--sg-primary-line);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #1a2750;
+  --bs-btn-active-border-color: var(--sg-primary-line);
+  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--sg-text);
+  --bs-btn-border-color: var(--sg-border);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--sg-surface-2);
+  --bs-btn-hover-border-color: var(--sg-primary-line);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--sg-surface-2);
+  --bs-btn-active-border-color: var(--sg-primary-line);
+  --bs-btn-focus-shadow-rgb: 34, 211, 238;
 }
 
 /* ---------- Navbar ---------- */
+/* The navbar markup uses .bg-white (a Bootstrap utility with !important),
+   so we need !important here to replace it with translucent navy. */
+.navbar.bg-white {
+  background-color: rgba(7, 13, 31, 0.82) !important;
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+}
+.navbar.border-bottom { border-bottom-color: var(--sg-border) !important; }
+
 .brand-mark {
   display: inline-grid;
   place-items: center;
   width: 2rem;
   height: 2rem;
   border-radius: 0.6rem;
-  background: var(--sg-primary);
-  color: #fff;
+  background: linear-gradient(135deg, var(--sg-primary), var(--sg-primary-deep));
+  color: var(--sg-on-primary);
   font-size: 1.05rem;
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
 }
 
+.navbar-brand { color: #fff; }
 .navbar .nav-link { font-weight: 500; color: var(--sg-muted); }
 .navbar .nav-link:hover { color: var(--sg-text); }
 .navbar .nav-link.active { color: var(--sg-primary); }
-.navbar .nav-link.disabled { opacity: 0.55; }
+.navbar .nav-link.disabled { color: var(--sg-muted); opacity: 0.45; }
 
 /* ---------- Cards ---------- */
 .card {
-  border-color: var(--sg-border);
+  --bs-card-bg: var(--sg-surface);
+  --bs-card-border-color: var(--sg-border);
+  --bs-card-cap-bg: transparent;
   border-radius: var(--sg-radius);
   box-shadow: var(--sg-shadow);
 }
 
 .card-header {
-  background: transparent;
   border-bottom-color: var(--sg-border);
   font-weight: 600;
 }
@@ -109,6 +200,7 @@ body {
   background: var(--sg-primary-soft);
   color: var(--sg-primary);
   font-size: 1.1rem;
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.18);
 }
 
 /* Stat cards on the dashboard */
@@ -117,6 +209,7 @@ body {
   font-size: clamp(1.15rem, 1rem + 1vw, 1.6rem);
   font-weight: 700;
   line-height: 1.2;
+  color: #fff;
 }
 
 /* Bootstrap cards allow breaking inside words; for stats we only want
@@ -124,39 +217,120 @@ body {
 .stat-label, .stat-value { word-wrap: normal; overflow-wrap: normal; }
 
 /* Subscription cards: a coloured left edge when a charge is close */
-.sub-card { border-left: 4px solid transparent; }
+.sub-card { border-left: 4px solid transparent; transition: border-color .15s, box-shadow .15s; }
+.sub-card:hover { box-shadow: var(--sg-shadow), 0 0 0 1px var(--sg-primary-line); }
 .sub-card.urgency-warning { border-left-color: var(--sg-warning); }
 .sub-card.urgency-danger { border-left-color: var(--sg-danger); }
-.sub-card .sub-price { font-size: 1.35rem; font-weight: 700; }
-.sub-card.is-inactive { opacity: 0.7; }
+.sub-card .sub-price { font-size: 1.35rem; font-weight: 700; color: #fff; }
+.sub-card.is-inactive { opacity: 0.6; }
 
-/* Soft badges (lighter than Bootstrap's solid ones) */
+/* Soft badges (tinted, lighter than Bootstrap's solid ones) */
 .badge-soft-success { background: var(--sg-success-soft); color: var(--sg-success); }
 .badge-soft-warning { background: var(--sg-warning-soft); color: var(--sg-warning); }
 .badge-soft-danger { background: var(--sg-danger-soft); color: var(--sg-danger); }
-.badge-soft-secondary { background: #f3f4f6; color: var(--sg-muted); }
+.badge-soft-secondary { background: rgba(139, 154, 184, 0.12); color: #aab6cf; }
 .badge-soft-primary { background: var(--sg-primary-soft); color: var(--sg-primary); }
 .badge { font-weight: 600; }
 
 /* Upcoming payments list */
-.list-group-item { border-color: var(--sg-border); }
+.list-group {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-color: var(--sg-text);
+  --bs-list-group-border-color: var(--sg-border);
+}
 .list-group-item.urgency-danger { box-shadow: inset 3px 0 0 var(--sg-danger); }
 .list-group-item.urgency-warning { box-shadow: inset 3px 0 0 var(--sg-warning); }
 
 /* Filter pills */
 .filter-pills .btn { border-radius: 999px; }
 
-/* ---------- Landing page ---------- */
-.hero {
-  background:
-    radial-gradient(60rem 30rem at 85% -10%, rgba(79, 70, 229, 0.14), transparent 60%),
-    radial-gradient(40rem 25rem at -10% 110%, rgba(5, 150, 105, 0.08), transparent 60%);
+/* Progress bars */
+.progress {
+  --bs-progress-bg: #1a2547;
+  --bs-progress-bar-bg: var(--sg-primary);
 }
 
-.hero h1 { letter-spacing: -0.02em; }
+/* ---------- Dropdowns, modals, alerts, toasts ---------- */
+.dropdown-menu {
+  --bs-dropdown-bg: var(--sg-surface-2);
+  --bs-dropdown-border-color: var(--sg-border);
+  --bs-dropdown-link-color: var(--sg-text);
+  --bs-dropdown-link-hover-color: #fff;
+  --bs-dropdown-link-hover-bg: rgba(34, 211, 238, 0.08);
+  --bs-dropdown-link-active-color: var(--sg-on-primary);
+  --bs-dropdown-link-active-bg: var(--sg-primary);
+  --bs-dropdown-divider-bg: var(--sg-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.modal {
+  --bs-modal-bg: var(--sg-surface);
+  --bs-modal-border-color: var(--sg-border);
+}
+.modal-backdrop { --bs-backdrop-bg: #01040c; --bs-backdrop-opacity: 0.7; }
+
+.alert-info {
+  --bs-alert-color: #a5f3fc;
+  --bs-alert-bg: rgba(34, 211, 238, 0.07);
+  --bs-alert-border-color: rgba(34, 211, 238, 0.28);
+}
+
+.toast.text-bg-dark {
+  background-color: var(--sg-surface-2) !important;
+  color: var(--sg-text) !important;
+  border: 1px solid var(--sg-primary-line) !important;
+}
+
+/* ---------- Forms ---------- */
+.form-control,
+.form-select {
+  background-color: var(--sg-input-bg);
+  border-color: var(--sg-input-border);
+  color: var(--sg-text);
+}
+.form-control::placeholder { color: #5f6f92; }
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--sg-input-bg);
+  border-color: var(--sg-primary);
+  color: var(--sg-text);
+  box-shadow: 0 0 0 0.25rem rgba(34, 211, 238, 0.2);
+}
+.form-check-input:checked {
+  background-color: var(--sg-primary);
+  border-color: var(--sg-primary);
+}
+.form-check-input:focus { box-shadow: 0 0 0 0.25rem rgba(34, 211, 238, 0.2); }
+
+/* ---------- Landing page ---------- */
+.hero {
+  position: relative;
+  background:
+    radial-gradient(55rem 28rem at 85% -10%, rgba(34, 211, 238, 0.18), transparent 60%),
+    radial-gradient(40rem 25rem at -10% 110%, rgba(14, 165, 233, 0.12), transparent 60%),
+    var(--sg-bg);
+  overflow: hidden;
+}
+/* Faint "circuit grid" behind the hero for the electric feel */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 70% 30%, #000 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 30%, #000 20%, transparent 70%);
+  pointer-events: none;
+}
+.hero > .container { position: relative; }
+
+.hero h1 { letter-spacing: -0.02em; color: #fff; }
 
 .hero-preview .card { max-width: 24rem; text-align: left; }
 .hero-preview .card + .card { margin-top: 0.75rem; }
+.hero-preview .card:first-child { box-shadow: var(--sg-shadow), 0 0 0 1px var(--sg-primary-line), 0 0 32px rgba(34, 211, 238, 0.15); }
 
 .feature-icon {
   display: inline-grid;
@@ -167,6 +341,7 @@ body {
   background: var(--sg-primary-soft);
   color: var(--sg-primary);
   font-size: 1.35rem;
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.2);
 }
 
 .step-number {
@@ -176,18 +351,34 @@ body {
   height: 2.25rem;
   border-radius: 50%;
   background: var(--sg-primary);
-  color: #fff;
+  color: var(--sg-on-primary);
   font-weight: 700;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
 }
 
 .cta-band {
-  background: var(--sg-primary);
-  color: #fff;
+  background:
+    radial-gradient(30rem 12rem at 100% 0%, rgba(34, 211, 238, 0.22), transparent 70%),
+    linear-gradient(135deg, #0b1838, #0a2547);
+  color: var(--sg-text);
+  border: 1px solid var(--sg-primary-line);
   border-radius: var(--sg-radius);
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.12);
 }
+/* The CTA button is marked "btn-light text-primary" in the HTML;
+   on navy we show it as the bright cyan primary button instead. */
+.cta-band .btn-light {
+  --bs-btn-bg: var(--sg-primary);
+  --bs-btn-border-color: var(--sg-primary);
+  --bs-btn-hover-bg: var(--sg-primary-hover);
+  --bs-btn-hover-border-color: var(--sg-primary-hover);
+  --bs-btn-active-bg: var(--sg-primary-hover);
+  color: var(--sg-on-primary) !important;
+}
+.cta-band .btn-light:hover { box-shadow: var(--sg-glow); }
 
 /* ---------- Footer ---------- */
-.site-footer { border-top: 1px solid var(--sg-border); background: var(--sg-surface); }
+.site-footer { border-top: 1px solid var(--sg-border); background: var(--sg-bg-deep); }
 
 /* Lets long text truncate inside flex rows */
 .min-w-0 { min-width: 0; }
