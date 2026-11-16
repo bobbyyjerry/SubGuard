@@ -1,0 +1,14 @@
+{# Shows messages created in Python with flash("Saved!", "success"). #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        {% set tone = "danger" if category == "error" else (category if category in ["success", "warning", "info", "danger"] else "info") %}
+        <div class="alert alert-{{ tone }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

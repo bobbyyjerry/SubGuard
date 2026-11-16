@@ -1,18 +1,130 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SubGuard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-  <main class="container py-5 text-center">
-    <h1 class="display-5 fw-bold">Hello, SubGuard 👋</h1>
-    <p class="lead text-secondary">
-      Your smart subscription &amp; free-trial reminder platform is up and running.
-    </p>
-    <span class="badge text-bg-success">Day 1 complete: Flask is working</span>
-  </main>
-</body>
-</html>
+{% extends "base.html" %}
+{% from "partials/_macros.html" import category_icon %}
+
+{% block content %}
+{# ---------- Hero ---------- #}
+<section class="hero py-5">
+  <div class="container py-lg-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="badge rounded-pill badge-soft-primary mb-3">
+          <i class="bi bi-bell me-1" aria-hidden="true"></i>Reminders before every charge
+        </span>
+        <h1 class="display-5 fw-bold mb-3">Never pay for a forgotten subscription again.</h1>
+        <p class="lead text-secondary mb-4">
+          SubGuard keeps all your subscriptions and free trials in one place, shows what they really
+          cost you each month, and emails you <strong>before</strong> you're charged, so you can cancel in time.
+        </p>
+        <div class="hero-actions d-flex flex-wrap gap-2">
+          <a href="#" class="btn btn-primary btn-lg">Get started for free</a>
+          <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-primary btn-lg">See the dashboard</a>
+        </div>
+        <p class="small text-secondary mt-3 mb-0">
+          <i class="bi bi-lock me-1" aria-hidden="true"></i>No bank connection. You enter your subscriptions yourself.
+        </p>
+      </div>
+
+      {# A small preview of what reminders look like #}
+      <div class="col-lg-6">
+        <div class="hero-preview d-flex flex-column align-items-center align-items-lg-end" aria-hidden="true">
+          <div class="card w-100">
+            <div class="card-body d-flex gap-3 align-items-center">
+              {{ category_icon("streaming") }}
+              <div class="flex-grow-1">
+                <div class="fw-semibold">Streaming service</div>
+                <div class="small text-secondary">Renews in 2 days</div>
+              </div>
+              <span class="fw-bold">$15.49</span>
+            </div>
+          </div>
+          <div class="card w-100">
+            <div class="card-body d-flex gap-3 align-items-center">
+              {{ category_icon("education") }}
+              <div class="flex-grow-1">
+                <div class="fw-semibold">Language app trial</div>
+                <div class="small text-secondary">Trial ends in 3 days, then $12.99/mo</div>
+              </div>
+              <span class="badge rounded-pill badge-soft-warning">Trial</span>
+            </div>
+          </div>
+          <div class="card w-100">
+            <div class="card-body">
+              <div class="small text-secondary">Estimated monthly spend</div>
+              <div class="fs-3 fw-bold">$97.40</div>
+              <div class="progress mt-2" role="presentation" style="height: .5rem">
+                <div class="progress-bar" style="width: 64%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ---------- Features ---------- #}
+<section class="py-5" aria-labelledby="features-heading">
+  <div class="container">
+    <div class="text-center mx-auto mb-5" style="max-width: 40rem">
+      <h2 id="features-heading" class="fw-bold">Everything you need to stay in control</h2>
+      <p class="text-secondary mb-0">Small monthly charges add up. SubGuard makes them visible.</p>
+    </div>
+
+    {% set features = [
+      ("bi-card-list", "All subscriptions in one place", "Name, price, billing cycle, category and a direct link to each cancellation page."),
+      ("bi-bell", "Reminders before you pay", "Get an email 1, 3 or 7 days before a renewal. Never twice for the same charge."),
+      ("bi-hourglass-split", "Free-trial tracking", "Know exactly when each trial ends and whether it turns into a paid plan."),
+      ("bi-pie-chart", "Spending analytics", "Monthly and yearly estimates, spending by category and savings from cancelling."),
+      ("bi-calendar3", "Renewal calendar", "See every upcoming charge on a month view and plan ahead."),
+      ("bi-shield-lock", "Private and secure", "Your account is yours alone. Passwords are hashed and we never touch your bank."),
+    ] %}
+    <div class="row g-4">
+      {% for icon, title, text in features %}
+        <div class="col-sm-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <span class="feature-icon mb-3" aria-hidden="true"><i class="bi {{ icon }}"></i></span>
+              <h3 class="h5 fw-semibold">{{ title }}</h3>
+              <p class="text-secondary mb-0">{{ text }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- How it works ---------- #}
+<section class="py-5" aria-labelledby="how-heading">
+  <div class="container">
+    <h2 id="how-heading" class="fw-bold text-center mb-5">How it works</h2>
+    {% set steps = [
+      ("Add your subscriptions", "Enter the price, billing cycle and next renewal date. It takes a minute each."),
+      ("See the real cost", "Your dashboard turns small charges into monthly and yearly totals."),
+      ("Get reminded in time", "We email you before each renewal or trial end, so you can decide to keep or cancel."),
+    ] %}
+    <div class="row g-4">
+      {% for title, text in steps %}
+        <div class="col-md-4 text-center">
+          <span class="step-number mb-3">{{ loop.index }}</span>
+          <h3 class="h5 fw-semibold">{{ title }}</h3>
+          <p class="text-secondary mb-0">{{ text }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- Call to action ---------- #}
+<section class="py-5">
+  <div class="container">
+    <div class="cta-band p-4 p-md-5 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+      <div>
+        <h2 class="h3 fw-bold mb-1">Find out what your subscriptions really cost.</h2>
+        <p class="mb-0 opacity-75">Free to use. Set up in under five minutes.</p>
+      </div>
+      <a href="#" class="btn btn-light btn-lg text-primary fw-semibold">Create your account</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

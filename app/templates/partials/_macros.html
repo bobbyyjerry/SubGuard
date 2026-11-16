@@ -1,0 +1,40 @@
+{# Reusable UI pieces. Import with:
+   {% from "partials/_macros.html" import stat_card, status_badge %} #}
+
+{% macro stat_card(label, value, icon, hint=None, tone="primary") %}
+  <div class="card h-100">
+    {# Phones: icon above the text. Wider screens: icon beside it. #}
+    <div class="card-body d-flex flex-column flex-sm-row gap-2 gap-sm-3 align-items-start">
+      <span class="icon-circle badge-soft-{{ tone }}" aria-hidden="true"><i class="bi {{ icon }}"></i></span>
+      <div class="min-w-0">
+        <div class="stat-label">
+          {{ label }}
+          {% if hint %}
+            <i class="bi bi-info-circle ms-1" tabindex="0" data-bs-toggle="tooltip" data-bs-title="{{ hint }}"
+               aria-label="{{ hint }}"></i>
+          {% endif %}
+        </div>
+        <div class="stat-value">{{ value }}</div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  {% set label, tone = STATUSES.get(status, (status|title, "secondary")) %}
+  <span class="badge rounded-pill badge-soft-{{ tone }}">{{ label }}</span>
+{% endmacro %}
+
+{% macro category_badge(category) %}
+  {% set label, icon = CATEGORIES.get(category, ("Other", "bi-box")) %}
+  <span class="badge rounded-pill badge-soft-secondary"><i class="bi {{ icon }} me-1" aria-hidden="true"></i>{{ label }}</span>
+{% endmacro %}
+
+{% macro category_icon(category) %}
+  {% set label, icon = CATEGORIES.get(category, ("Other", "bi-box")) %}
+  <span class="icon-circle" aria-hidden="true"><i class="bi {{ icon }}"></i></span>
+{% endmacro %}
+
+{% macro days_badge(days) %}
+  <span class="badge rounded-pill badge-soft-{{ days|urgency }}">{{ days|relative_days }}</span>
+{% endmacro %}

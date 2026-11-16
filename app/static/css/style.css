@@ -1,0 +1,203 @@
+/* =========================================================
+   SubGuard styles: small custom layer on top of Bootstrap 5.
+   All colours are defined once as variables ("design tokens")
+   so the whole look can be changed in one place.
+   ========================================================= */
+
+:root {
+  /* Brand */
+  --sg-primary: #4f46e5;          /* indigo */
+  --sg-primary-hover: #4338ca;
+  --sg-primary-soft: #eef2ff;
+
+  /* Surfaces and text */
+  --sg-bg: #f6f7fb;
+  --sg-surface: #ffffff;
+  --sg-border: #e6e8ef;
+  --sg-text: #111827;
+  --sg-muted: #6b7280;
+
+  /* Status colours */
+  --sg-success: #059669;
+  --sg-success-soft: #ecfdf5;
+  --sg-warning: #d97706;
+  --sg-warning-soft: #fffbeb;
+  --sg-danger: #dc2626;
+  --sg-danger-soft: #fef2f2;
+
+  --sg-radius: 0.875rem;
+  --sg-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.06);
+
+  /* Feed our tokens into Bootstrap's own variables */
+  --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bs-body-bg: var(--sg-bg);
+  --bs-body-color: var(--sg-text);
+  --bs-secondary-color: var(--sg-muted);
+  --bs-border-color: var(--sg-border);
+  --bs-primary: var(--sg-primary);
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color-rgb: 79, 70, 229;
+  --bs-link-hover-color-rgb: 67, 56, 202;
+}
+
+body {
+  background: var(--sg-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Buttons ---------- */
+.btn { border-radius: 0.6rem; font-weight: 500; }
+
+.btn-primary {
+  --bs-btn-bg: var(--sg-primary);
+  --bs-btn-border-color: var(--sg-primary);
+  --bs-btn-hover-bg: var(--sg-primary-hover);
+  --bs-btn-hover-border-color: var(--sg-primary-hover);
+  --bs-btn-active-bg: var(--sg-primary-hover);
+  --bs-btn-active-border-color: var(--sg-primary-hover);
+  --bs-btn-disabled-bg: var(--sg-primary);
+  --bs-btn-disabled-border-color: var(--sg-primary);
+  --bs-btn-focus-shadow-rgb: 79, 70, 229;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--sg-primary);
+  --bs-btn-border-color: var(--sg-primary);
+  --bs-btn-hover-bg: var(--sg-primary);
+  --bs-btn-hover-border-color: var(--sg-primary);
+  --bs-btn-active-bg: var(--sg-primary-hover);
+  --bs-btn-focus-shadow-rgb: 79, 70, 229;
+}
+
+/* ---------- Navbar ---------- */
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--sg-primary);
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.navbar .nav-link { font-weight: 500; color: var(--sg-muted); }
+.navbar .nav-link:hover { color: var(--sg-text); }
+.navbar .nav-link.active { color: var(--sg-primary); }
+.navbar .nav-link.disabled { opacity: 0.55; }
+
+/* ---------- Cards ---------- */
+.card {
+  border-color: var(--sg-border);
+  border-radius: var(--sg-radius);
+  box-shadow: var(--sg-shadow);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom-color: var(--sg-border);
+  font-weight: 600;
+}
+
+.icon-circle {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--sg-primary-soft);
+  color: var(--sg-primary);
+  font-size: 1.1rem;
+}
+
+/* Stat cards on the dashboard */
+.stat-label { font-size: 0.85rem; color: var(--sg-muted); font-weight: 500; }
+.stat-value {
+  font-size: clamp(1.15rem, 1rem + 1vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Bootstrap cards allow breaking inside words; for stats we only want
+   line breaks at spaces (e.g. around the "+" between currencies). */
+.stat-label, .stat-value { word-wrap: normal; overflow-wrap: normal; }
+
+/* Subscription cards: a coloured left edge when a charge is close */
+.sub-card { border-left: 4px solid transparent; }
+.sub-card.urgency-warning { border-left-color: var(--sg-warning); }
+.sub-card.urgency-danger { border-left-color: var(--sg-danger); }
+.sub-card .sub-price { font-size: 1.35rem; font-weight: 700; }
+.sub-card.is-inactive { opacity: 0.7; }
+
+/* Soft badges (lighter than Bootstrap's solid ones) */
+.badge-soft-success { background: var(--sg-success-soft); color: var(--sg-success); }
+.badge-soft-warning { background: var(--sg-warning-soft); color: var(--sg-warning); }
+.badge-soft-danger { background: var(--sg-danger-soft); color: var(--sg-danger); }
+.badge-soft-secondary { background: #f3f4f6; color: var(--sg-muted); }
+.badge-soft-primary { background: var(--sg-primary-soft); color: var(--sg-primary); }
+.badge { font-weight: 600; }
+
+/* Upcoming payments list */
+.list-group-item { border-color: var(--sg-border); }
+.list-group-item.urgency-danger { box-shadow: inset 3px 0 0 var(--sg-danger); }
+.list-group-item.urgency-warning { box-shadow: inset 3px 0 0 var(--sg-warning); }
+
+/* Filter pills */
+.filter-pills .btn { border-radius: 999px; }
+
+/* ---------- Landing page ---------- */
+.hero {
+  background:
+    radial-gradient(60rem 30rem at 85% -10%, rgba(79, 70, 229, 0.14), transparent 60%),
+    radial-gradient(40rem 25rem at -10% 110%, rgba(5, 150, 105, 0.08), transparent 60%);
+}
+
+.hero h1 { letter-spacing: -0.02em; }
+
+.hero-preview .card { max-width: 24rem; text-align: left; }
+.hero-preview .card + .card { margin-top: 0.75rem; }
+
+.feature-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.8rem;
+  background: var(--sg-primary-soft);
+  color: var(--sg-primary);
+  font-size: 1.35rem;
+}
+
+.step-number {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--sg-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.cta-band {
+  background: var(--sg-primary);
+  color: #fff;
+  border-radius: var(--sg-radius);
+}
+
+/* ---------- Footer ---------- */
+.site-footer { border-top: 1px solid var(--sg-border); background: var(--sg-surface); }
+
+/* Lets long text truncate inside flex rows */
+.min-w-0 { min-width: 0; }
+
+/* ---------- Toasts ---------- */
+.toast-container { z-index: 1090; }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 575.98px) {
+  .display-5 { font-size: 2rem; }
+  .hero { text-align: center; }
+  .hero .hero-actions { justify-content: center; }
+}

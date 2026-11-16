@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import stat_card, category_icon, days_badge %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  {% if is_preview %}
+    <div class="alert alert-info d-flex gap-2 align-items-start small" role="status">
+      <i class="bi bi-eye mt-1" aria-hidden="true"></i>
+      <div><strong>Preview mode.</strong> This dashboard shows sample data. Your own subscriptions will appear here once accounts and saving are built.</div>
+    </div>
+  {% endif %}
+
+  {# ---------- Page header ---------- #}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">Dashboard</h1>
+      <p class="text-secondary mb-0">Here's what your subscriptions are costing you.</p>
+    </div>
+    <a href="#" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add subscription</a>
+  </div>
+
+  {# ---------- Stat cards ---------- #}
+  {% set estimate_hint = "Estimated from the prices and billing cycles you entered. Actual charges can differ (taxes, exchange rates, price changes). Free trials are not included." %}
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      {{ stat_card("Est. monthly spend", monthly|money_totals, "bi-wallet2", hint=estimate_hint) }}
+    </div>
+    <div class="col-6 col-xl-3">
+      {{ stat_card("Est. annual spend", annual|money_totals, "bi-graph-up-arrow", hint=estimate_hint) }}
+    </div>
+    <div class="col-6 col-xl-3">
+      {{ stat_card("Active subscriptions", active_count, "bi-collection", tone="success") }}
+    </div>
+    <div class="col-6 col-xl-3">
+      {{ stat_card("Trials ending ≤ 7 days", trials_ending_soon|length, "bi-hourglass-split",
+                   tone="warning" if trials_ending_soon else "secondary") }}
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    {# ---------- Upcoming payments ---------- #}
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+          <span><i class="bi bi-clock-history me-2 text-primary" aria-hidden="true"></i>Upcoming payments</span>
+          <span class="small text-secondary fw-normal">Next 30 days</span>
+        </div>
+        {% if upcoming %}
+          <ul class="list-group list-group-flush">
+            {% for s in upcoming %}
+              {% set days = (s.next_renewal_date - today).days %}
+              <li class="list-group-item d-flex align-items-center gap-3 py-3 {% if days <= 7 %}urgency-{{ days|urgency }}{% endif %}">
+                {{ category_icon(s.category) }}
+                <div class="flex-grow-1 min-w-0">
+                  <div class="fw-semibold text-truncate">
+                    {{ s.name }}
+                    {% if s.is_trial %}<span class="badge rounded-pill badge-soft-primary ms-1">Trial ends</span>{% endif %}
+                  </div>
+                  <div class="small text-secondary">{{ s.next_renewal_date|nice_date }}</div>
+                </div>
+                <div class="text-end">
+                  <div class="fw-semibold">
+                    {% if s.is_trial and not s.converts_to_paid %}
+                      <span class="text-secondary">No charge</span>
+                    {% else %}
+                      {{ s.price|money(s.currency) }}
+                    {% endif %}
+                  </div>
+                  {{ days_badge(days) }}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="card-body text-center text-secondary py-5">
+            <i class="bi bi-emoji-smile fs-2 d-block mb-2" aria-hidden="true"></i>Nothing due in the next 30 days.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ---------- Free trials ---------- #}
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header py-3">
+          <i class="bi bi-hourglass-split me-2 text-primary" aria-hidden="true"></i>Active free trials
+        </div>
+        <div class="card-body d-flex flex-column gap-3">
+          {% for t in trials %}
+            {% set days = (t.trial_end_date - today).days %}
+            <div class="border rounded-3 p-3">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div class="fw-semibold">{{ t.name }}</div>
+                {{ days_badge(days) }}
+              </div>
+              <div class="small text-secondary mb-2">
+                Ends {{ t.trial_end_date|nice_date }} ·
+                {% if t.converts_to_paid %}
+                  then <strong class="text-body">{{ t.price|money(t.currency) }}{{ t.billing_cycle|cycle_suffix }}</strong>
+                {% else %}
+                  won't charge you
+                {% endif %}
+              </div>
+              {% if t.converts_to_paid %}
+                <div class="progress" role="progressbar" aria-label="Time left in trial"
+                     aria-valuenow="{{ days }}" aria-valuemin="0" aria-valuemax="30" style="height: .375rem">
+                  <div class="progress-bar bg-{{ days|urgency }}" style="width: {{ [100 - days * 100 // 30, 5]|max }}%"></div>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <p class="text-secondary text-center my-auto">No active free trials.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- All subscriptions ---------- #}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="h5 fw-bold mb-0">Your subscriptions</h2>
+    <div class="filter-pills d-flex flex-wrap gap-1" data-filter-group="#subscriptionGrid" role="group" aria-label="Filter by status">
+      {% for value, label in [("all", "All"), ("active", "Active"), ("paused", "Paused"), ("cancelled", "Cancelled")] %}
+        <button type="button" class="btn btn-sm btn-outline-primary{% if value == 'all' %} active{% endif %}"
+                data-filter="{{ value }}" aria-pressed="{{ 'true' if value == 'all' else 'false' }}">{{ label }}</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="row g-3" id="subscriptionGrid">
+    {% for sub in subscriptions %}
+      <div class="col-sm-6 col-lg-4 col-xxl-3" data-filter-item data-status="{{ sub.status }}">
+        {% include "partials/_sub_card.html" %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

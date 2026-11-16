@@ -1,0 +1,59 @@
+{# One subscription card. Expects `sub` (a subscription) and `today`. #}
+{% from "partials/_macros.html" import status_badge, category_badge, category_icon, days_badge %}
+{% set event_date = sub.trial_end_date if sub.is_trial else sub.next_renewal_date %}
+{% set days = (event_date - today).days %}
+{% set is_active = sub.status == "active" %}
+
+<div class="card sub-card h-100 {% if is_active %}urgency-{{ days|urgency }}{% else %}is-inactive{% endif %}">
+  <div class="card-body d-flex flex-column">
+    <div class="d-flex align-items-start gap-3 mb-3">
+      {{ category_icon(sub.category) }}
+      <div class="flex-grow-1 min-w-0">
+        <h3 class="h6 mb-1 text-truncate">{{ sub.name }}</h3>
+        {{ category_badge(sub.category) }}
+        {% if sub.is_trial %}<span class="badge rounded-pill badge-soft-primary">Free trial</span>{% endif %}
+      </div>
+
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                aria-label="Actions for {{ sub.name }}">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><span class="dropdown-item disabled"><i class="bi bi-pencil me-2"></i>Edit</span></li>
+          {% if sub.cancellation_url %}
+            <li><a class="dropdown-item" href="{{ sub.cancellation_url }}" target="_blank" rel="noopener noreferrer">
+              <i class="bi bi-box-arrow-up-right me-2"></i>Cancellation page</a></li>
+          {% endif %}
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form method="post" action="#" data-demo
+                  data-confirm="Delete “{{ sub.name }}”? This removes it and its reminders permanently."
+                  data-confirm-button="Delete">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>Delete</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub-price mb-1">
+      {{ sub.price|money(sub.currency) }}<span class="fs-6 fw-normal text-secondary">{{ sub.billing_cycle|cycle_suffix }}</span>
+    </div>
+    {% if sub.is_trial %}
+      <div class="small text-secondary mb-3">
+        {{ "Then converts to paid" if sub.converts_to_paid else "Does not convert to paid" }}
+      </div>
+    {% else %}
+      <div class="small text-secondary mb-3">Estimated · {{ BILLING_CYCLES[sub.billing_cycle][0] }}</div>
+    {% endif %}
+
+    <div class="mt-auto d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+      <span class="text-secondary">
+        {{ "Trial ends" if sub.is_trial else "Renews" }} {{ event_date|nice_date }}
+      </span>
+      {% if is_active %}{{ days_badge(days) }}{% else %}{{ status_badge(sub.status) }}{% endif %}
+    </div>
+  </div>
+</div>

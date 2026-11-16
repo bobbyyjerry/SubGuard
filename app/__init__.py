@@ -39,9 +39,21 @@ def create_app(config_name=None):
     db.init_app(app)
     csrf.init_app(app)
 
+    # Template filters (money, dates) and shared constants.
+    from .template_helpers import register_template_helpers
+
+    register_template_helpers(app)
+
     # Register blueprints (groups of routes).
+    from .routes.dashboard import bp as dashboard_bp
     from .routes.main import bp as main_bp
 
     app.register_blueprint(main_bp)
+    app.register_blueprint(dashboard_bp)
+
+    # Friendly 404 / 500 pages.
+    from .errors import register_error_handlers
+
+    register_error_handlers(app)
 
     return app
