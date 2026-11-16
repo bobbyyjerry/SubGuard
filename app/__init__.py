@@ -7,10 +7,11 @@ production server call it with their own settings.
 import os
 from pathlib import Path
 
+import click
 from flask import Flask
 
 from .config import config_by_name
-from .extensions import csrf, db
+from .extensions import csrf, db, login_manager
 
 
 def create_app(config_name=None):
@@ -38,6 +39,7 @@ def create_app(config_name=None):
     # Attach extensions to this app.
     db.init_app(app)
     csrf.init_app(app)
+    login_manager.init_app(app)
 
     # Template filters (money, dates) and shared constants.
     from .template_helpers import register_template_helpers
@@ -45,11 +47,19 @@ def create_app(config_name=None):
     register_template_helpers(app)
 
     # Register blueprints (groups of routes).
+    from .routes.auth import bp as auth_bp
     from .routes.dashboard import bp as dashboard_bp
     from .routes.main import bp as main_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(auth_bp)
+
+    @app.cli.command("init-db")
+    def init_db():
+        """Create any missing database tables."""
+        db.create_all()
+        click.echo("Database tables are ready.")
 
     # Friendly 404 / 500 pages.
     from .errors import register_error_handlers

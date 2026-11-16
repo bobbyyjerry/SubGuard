@@ -12,10 +12,13 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env      # then set SECRET_KEY inside .env
+flask init-db
 flask run
 ```
 
-Open http://127.0.0.1:5000
+Open http://127.0.0.1:5000 and select **Get started** to create an account.
+If you already have a virtual environment and `.env`, start at `flask init-db` after activating it.
+The database defaults to `instance/subguard.db`.
 
 ## Run the tests
 

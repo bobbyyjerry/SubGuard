@@ -16,8 +16,12 @@
           cost you each month, and emails you <strong>before</strong> you're charged, so you can cancel in time.
         </p>
         <div class="hero-actions d-flex flex-wrap gap-2">
-          <a href="#" class="btn btn-primary btn-lg">Get started for free</a>
-          <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-primary btn-lg">See the dashboard</a>
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg">Open dashboard</a>
+          {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Get started for free</a>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-primary btn-lg">See the dashboard</a>
+          {% endif %}
         </div>
         <p class="small text-secondary mt-3 mb-0">
           <i class="bi bi-lock me-1" aria-hidden="true"></i>No bank connection. You enter your subscriptions yourself.
@@ -123,7 +127,11 @@
         <h2 class="h3 fw-bold mb-1">Find out what your subscriptions really cost.</h2>
         <p class="mb-0 opacity-75">Free to use. Set up in under five minutes.</p>
       </div>
-      <a href="#" class="btn btn-light btn-lg text-primary fw-semibold">Create your account</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-light btn-lg text-primary fw-semibold">Open dashboard</a>
+      {% else %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg text-primary fw-semibold">Create your account</a>
+      {% endif %}
     </div>
   </div>
 </section>

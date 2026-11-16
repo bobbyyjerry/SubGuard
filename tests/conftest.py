@@ -14,8 +14,8 @@ def app():
     app = create_app("testing")
     with app.app_context():
         db.create_all()
-        yield app
-        db.session.remove()
+    yield app
+    with app.app_context():
         db.drop_all()
 
 

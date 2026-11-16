@@ -39,11 +39,28 @@
         {% endfor %}
       </ul>
 
-      {# Day 3 replaces these with real login/sign-up links and a user menu. #}
-      <div class="d-flex gap-2 pb-2 pb-lg-0">
-        <a class="btn btn-outline-secondary" href="#">Log in</a>
-        <a class="btn btn-primary" href="#">Get started</a>
-      </div>
+      {% if current_user.is_authenticated %}
+        <div class="dropdown pb-2 pb-lg-0">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1" aria-hidden="true"></i>Account
+          </button>
+          <ul class="dropdown-menu dropdown-menu-lg-end">
+            <li><span class="dropdown-header text-wrap text-break" style="max-width: 16rem">{{ current_user.email }}</span></li>
+            <li>
+              <form action="{{ url_for('auth.logout') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="dropdown-item">Log out</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      {% else %}
+        <div class="d-flex gap-2 pb-2 pb-lg-0">
+          <a class="btn btn-outline-secondary" href="{{ url_for('auth.login') }}">Log in</a>
+          <a class="btn btn-primary" href="{{ url_for('auth.register') }}">Get started</a>
+        </div>
+      {% endif %}
     </div>
   </div>
 </nav>
