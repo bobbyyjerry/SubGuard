@@ -190,6 +190,24 @@ body {
   font-weight: 600;
 }
 
+.spending-chart {
+  position: relative;
+  height: clamp(15rem, 60vw, 19rem);
+}
+
+.analytics-table {
+  --bs-table-bg: transparent;
+}
+
+.analytics-table th,
+.analytics-table td {
+  padding-inline: 1rem;
+}
+
+.analytics-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
 .icon-circle {
   display: inline-grid;
   place-items: center;

@@ -7,7 +7,7 @@ from flask import Blueprint, render_template
 from flask_login import current_user
 
 from ..models import Subscription
-from ..services.billing import spending_totals
+from ..services.billing import active_paid_subscriptions, spending_totals
 
 bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
@@ -56,11 +56,10 @@ def index():
     else:
         subscriptions = Subscription.list_for_user(current_user.id)
 
-    active = [s for s in subscriptions if s.status == "active"]
-    paid = [s for s in active if not s.is_trial]
+    paid = active_paid_subscriptions(subscriptions)
     monthly, annual = spending_totals(paid)
     trials = sorted(
-        (s for s in active if s.is_trial and s.trial_end_date >= today),
+        (s for s in subscriptions if s.status == "active" and s.is_trial and s.trial_end_date >= today),
         key=lambda s: s.trial_end_date,
     )
     upcoming_payments = paid + [s for s in trials if s.converts_to_paid]

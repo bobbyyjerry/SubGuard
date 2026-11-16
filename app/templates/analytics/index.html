@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import category_badge %}
+
+{% block title %}Spending analytics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">Spending analytics</h1>
+      <p class="text-secondary mb-0">Estimated spending on active paid subscriptions by category.</p>
+    </div>
+    {% if currencies|length > 1 %}
+      <nav class="d-flex flex-wrap align-items-center gap-2" aria-label="Spending currency">
+        <span class="small text-secondary">Currency</span>
+        {% for code in currencies %}
+          <a class="btn btn-sm {{ 'btn-primary' if code == currency else 'btn-outline-secondary' }}"
+             href="{{ url_for('analytics.index', currency=code) }}"
+             {% if code == currency %}aria-current="page"{% endif %}>{{ code }}</a>
+        {% endfor %}
+      </nav>
+    {% elif currency %}
+      <span class="small text-secondary">Amounts in {{ currency }}</span>
+    {% endif %}
+  </div>
+
+  {% if categories %}
+    <div id="spending-charts" class="mb-4" hidden>
+      <div class="row g-3">
+        <section class="col-lg-5" aria-labelledby="monthly-spending">
+          <div class="card h-100">
+            <div class="card-body p-3 p-sm-4">
+              <h2 id="monthly-spending" class="h6 text-secondary mb-1">Monthly spending</h2>
+              <p class="h3 fw-bold mb-3">{{ monthly_total|money(currency) }}</p>
+              <div class="spending-chart">
+                <canvas id="monthly-category-chart" role="img" aria-label="Monthly spending share by category"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="col-lg-7" aria-labelledby="annual-spending">
+          <div class="card h-100">
+            <div class="card-body p-3 p-sm-4">
+              <h2 id="annual-spending" class="h6 text-secondary mb-1">Annual spending</h2>
+              <p class="h3 fw-bold mb-3">{{ annual_total|money(currency) }}</p>
+              <div class="spending-chart">
+                <canvas id="annual-category-chart" role="img" aria-label="Annual spending by category"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="card" aria-labelledby="category-breakdown">
+      <div class="card-header py-3">
+        <h2 id="category-breakdown" class="h6 fw-semibold mb-0">Category breakdown</h2>
+      </div>
+      <div class="table-responsive">
+        <table class="table analytics-table align-middle mb-0">
+          <caption class="visually-hidden">Estimated subscription spending in {{ currency }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col" class="text-end">Monthly</th>
+              <th scope="col" class="text-end">Annual</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for category in categories %}
+              <tr>
+                <th scope="row">{{ category_badge(category.key) }}</th>
+                <td class="text-end text-nowrap">{{ category.monthly|money(currency) }}</td>
+                <td class="text-end text-nowrap">{{ category.annual|money(currency) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <script type="application/json" id="spending-chart-data">{{ {"currency": currency, "categories": categories}|tojson }}</script>
+  {% else %}
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-bar-chart-line fs-2 text-primary" aria-hidden="true"></i>
+        <h2 class="h5 fw-semibold mt-2">No spending to show yet</h2>
+        <p class="text-secondary mb-3">Add or resume a paid subscription to see your spending by category.</p>
+        <a class="btn btn-primary" href="{{ url_for('subscriptions.add') }}">Add subscription</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {% if categories %}
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+            integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <script defer src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+  {% endif %}
+{% endblock %}
