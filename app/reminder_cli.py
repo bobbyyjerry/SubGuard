@@ -39,6 +39,8 @@ def reminders_command(once):
     schema = inspect(db.engine)
     if not all(schema.has_table(model.__tablename__) for model in (ReminderDelivery, UserPreferences)):
         raise click.ClickException("Run flask init-db to create the reminder and preference tables.")
+    if not any(column["name"] == "billing_anchor_date" for column in schema.get_columns("subscriptions")):
+        raise click.ClickException("Run flask init-db to update the subscriptions table.")
 
     if once:
         if _scan(app, settings, lead_days):

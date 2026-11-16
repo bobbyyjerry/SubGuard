@@ -5,6 +5,7 @@ from flask_login import current_user, login_required
 from ..extensions import db
 from ..forms import SubscriptionForm
 from ..models import Subscription
+from ..services.renewals import advance_renewals_for_user
 from ..services.timezones import today_for_user
 
 bp = Blueprint("subscriptions", __name__, url_prefix="/subscriptions")
@@ -43,10 +44,10 @@ def _apply_change(statement, subscription_id, message):
 @bp.get("/")
 @login_required
 def index():
+    today = today_for_user(current_user)
+    advance_renewals_for_user(current_user.id, today)
     subscriptions = Subscription.list_for_user(current_user.id)
-    return render_template(
-        "subscriptions/index.html", subscriptions=subscriptions, is_preview=False, today=today_for_user(current_user),
-    )
+    return render_template("subscriptions/index.html", subscriptions=subscriptions, is_preview=False, today=today)
 
 
 @bp.route("/new", methods=["GET", "POST"])
@@ -54,7 +55,10 @@ def index():
 def add():
     form = SubscriptionForm()
     if form.validate_on_submit():
-        db.session.add(Subscription(user_id=current_user.id, **_form_values(form)))
+        values = _form_values(form)
+        db.session.add(Subscription(
+            user_id=current_user.id, billing_anchor_date=values["next_renewal_date"], **values,
+        ))
         return _save_changes("Subscription added.")
     return render_template("subscriptions/form.html", form=form, subscription=None)
 
@@ -65,7 +69,11 @@ def edit(subscription_id):
     subscription = db.first_or_404(db.select(Subscription).where(*_owned_record(subscription_id)))
     form = SubscriptionForm(obj=subscription)
     if form.validate_on_submit():
-        statement = db.update(Subscription).values(**_form_values(form))
+        values = _form_values(form)
+        if values["next_renewal_date"] != subscription.next_renewal_date:
+            # A date the user typed becomes the new starting point for future renewals.
+            values["billing_anchor_date"] = values["next_renewal_date"]
+        statement = db.update(Subscription).values(**values)
         return _apply_change(statement, subscription_id, "Subscription updated.")
     return render_template("subscriptions/form.html", form=form, subscription=subscription)
 

@@ -8,6 +8,7 @@ from flask_login import current_user
 
 from ..models import Subscription
 from ..services.billing import active_paid_subscriptions, spending_totals
+from ..services.renewals import advance_renewals_for_user
 from ..services.timezones import today_for_user
 
 bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
@@ -55,6 +56,7 @@ def index():
     if is_preview:
         subscriptions = _sample_subscriptions(today)
     else:
+        advance_renewals_for_user(current_user.id, today)
         subscriptions = Subscription.list_for_user(current_user.id)
 
     paid = active_paid_subscriptions(subscriptions)

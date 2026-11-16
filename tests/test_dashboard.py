@@ -72,12 +72,16 @@ def test_dashboard_uses_only_the_signed_in_users_records(app, client, monkeypatc
     assert "Monthly subscription" not in other_client.get("/dashboard/").get_data(as_text=True)
 
     stats = html.split('id="upcoming-payments"', 1)[0]
-    assert "€10.00 + $20.60 + ¥8" in stats
-    assert "€120.00 + $247.15 + ¥101" in stats
+    # The trial that ended yesterday became a paid $500 monthly subscription, and the
+    # overdue EUR renewal moved a quarter ahead (currencies are listed by next renewal).
+    assert "$520.60 + ¥8 + €10.00" in stats
+    assert "$6,247.15 + ¥101 + €120.00" in stats
     assert re.search(r'Trials ending ≤ 7 days.*?class="stat-value">1</div>', stats, re.DOTALL)
 
     upcoming = _section(html, "upcoming-payments")
-    due_in_order = ["Monthly subscription", "Weekly subscription", "Trial converting soon", "Yearly subscription"]
+    due_in_order = [
+        "Monthly subscription", "Weekly subscription", "Trial converting soon", "Expired trial", "Yearly subscription",
+    ]
     positions = [upcoming.index(name) for name in due_in_order]
     assert positions == sorted(positions)
     assert upcoming.count('class="list-group-item ') == len(due_in_order)

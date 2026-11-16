@@ -69,8 +69,13 @@ def create_app(config_name=None):
 
     @app.cli.command("init-db")
     def init_db():
-        """Create any missing database tables."""
+        """Create any missing database tables and columns."""
         db.create_all()
+        # create_all() never changes existing tables, so add newer columns here.
+        columns = {column["name"] for column in db.inspect(db.engine).get_columns("subscriptions")}
+        if "billing_anchor_date" not in columns:
+            with db.engine.begin() as connection:
+                connection.execute(db.text("ALTER TABLE subscriptions ADD COLUMN billing_anchor_date DATE"))
         click.echo("Database tables are ready.")
 
     # Friendly 404 / 500 pages.

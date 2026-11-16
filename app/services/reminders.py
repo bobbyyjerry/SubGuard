@@ -11,6 +11,7 @@ from ..extensions import db
 from ..models import ReminderDelivery, Subscription, User, UserPreferences
 from ..template_helpers import cycle_suffix, money, nice_date
 from .mail import MailRejected, MailUnconfirmed, deliver
+from .renewals import advance_all_renewals
 from .timezones import local_date, utc_now
 
 
@@ -69,6 +70,8 @@ def _claim(subscription_id, event_date):
 def send_due_reminders(settings, lead_days, *, now=None):
     """Check each account's local reminder window and return sent and failed counts."""
     now = utc_now() if now is None else now
+    # Passed renewal dates move to the next cycle first, so it gets its own reminder.
+    advance_all_renewals(now)
     utc_date = now.astimezone(timezone.utc).date()
     # An account's local date can be one day ahead of or behind UTC.
     latest_date = utc_date + timedelta(days=max(lead_days, *REMINDER_LEAD_TIMES) + 1)

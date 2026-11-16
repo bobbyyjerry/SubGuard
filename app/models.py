@@ -44,6 +44,9 @@ class Subscription(db.Model):
     currency: Mapped[str] = mapped_column(String(3))
     billing_cycle: Mapped[str] = mapped_column(String(12))
     next_renewal_date: Mapped[date]
+    # The date the user entered. Later renewals are counted from it so
+    # month-end dates don't drift (see services/renewals.py).
+    billing_anchor_date: Mapped[date | None]
     category: Mapped[str] = mapped_column(String(20))
     subscription_type: Mapped[str] = mapped_column(String(20), default="paid")
     status: Mapped[str] = mapped_column(String(12), default="active")
