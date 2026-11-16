@@ -40,6 +40,11 @@ class Subscription(db.Model):
     status: Mapped[str] = mapped_column(String(12), default="active")
     cancellation_url: Mapped[str | None] = mapped_column(String(2048))
 
+    @classmethod
+    def list_for_user(cls, user_id):
+        statement = db.select(cls).filter_by(user_id=user_id).order_by(cls.next_renewal_date, cls.id)
+        return db.session.scalars(statement).all()
+
     @property
     def is_trial(self):
         return self.subscription_type != "paid"

@@ -21,6 +21,7 @@ If you already have a virtual environment and `.env`, start at `flask init-db` a
 The database defaults to `instance/subguard.db`.
 
 After logging in, use **Subscriptions** to add and manage subscriptions or free trials.
+The **Dashboard** shows your saved subscriptions, monthly and annual estimates by currency, upcoming payments, and active free trials.
 
 ## Run the tests
 

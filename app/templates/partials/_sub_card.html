@@ -69,7 +69,7 @@
 
     <div class="mt-auto d-flex flex-wrap justify-content-between align-items-center gap-2 small">
       <span class="text-secondary">
-        {{ "Trial ends" if sub.is_trial else "Renews" }} {{ event_date|nice_date }}
+        {% if sub.is_trial %}{{ "Trial ended" if days < 0 else "Trial ends" }}{% else %}Renews{% endif %} {{ event_date|nice_date }}
       </span>
       {% if is_active %}{{ days_badge(days) }}{% else %}{{ status_badge(sub.status) }}{% endif %}
     </div>

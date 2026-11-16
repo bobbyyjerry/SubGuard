@@ -42,12 +42,7 @@ def _apply_change(statement, subscription_id, message):
 @bp.get("/")
 @login_required
 def index():
-    statement = (
-        db.select(Subscription)
-        .filter_by(user_id=current_user.id)
-        .order_by(Subscription.next_renewal_date, Subscription.id)
-    )
-    subscriptions = db.session.scalars(statement).all()
+    subscriptions = Subscription.list_for_user(current_user.id)
     return render_template("subscriptions/index.html", subscriptions=subscriptions, is_preview=False)
 
 

@@ -1,26 +1,15 @@
-"""Dashboard.
-
-DAY 2 VERSION: shows SAMPLE data so we can design the layout.
-On Day 5 the sample list is replaced by the logged-in user's real
-subscriptions and the calculations move to app/services/billing.py.
-The objects below use the same field names as the future database model,
-so the template will not need to change.
-"""
+"""Personal dashboard for signed-in users and a public sample dashboard."""
 from datetime import date, timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 
 from flask import Blueprint, render_template
+from flask_login import current_user
+
+from ..models import Subscription
+from ..services.billing import spending_totals
 
 bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
-
-# How many "months" one billing period is worth (for monthly estimates).
-MONTHLY_FACTOR = {
-    "weekly": Decimal(52) / Decimal(12),
-    "monthly": Decimal(1),
-    "quarterly": Decimal(1) / Decimal(3),
-    "yearly": Decimal(1) / Decimal(12),
-}
 
 
 def _sample_subscriptions(today):
@@ -58,41 +47,43 @@ def _sample_subscriptions(today):
     ]
 
 
-def _monthly_totals(subscriptions):
-    """Estimated monthly cost per currency, e.g. {"USD": Decimal("67.45"), "EUR": Decimal("30.00")}.
-    Only active, paid (non-trial) subscriptions count."""
-    totals = {}
-    for s in subscriptions:
-        if s.status == "active" and not s.is_trial:
-            amount = s.price * MONTHLY_FACTOR[s.billing_cycle]
-            totals[s.currency] = totals.get(s.currency, Decimal(0)) + amount
-    return {cur: amount.quantize(Decimal("0.01")) for cur, amount in totals.items()}
-
-
-@bp.route("/")
+@bp.get("/")
 def index():
     today = date.today()
-    subscriptions = _sample_subscriptions(today)
-
-    monthly = _monthly_totals(subscriptions)
-    annual = {cur: (amount * 12).quantize(Decimal("0.01")) for cur, amount in monthly.items()}
+    is_preview = not current_user.is_authenticated
+    if is_preview:
+        subscriptions = _sample_subscriptions(today)
+    else:
+        subscriptions = Subscription.list_for_user(current_user.id)
 
     active = [s for s in subscriptions if s.status == "active"]
-    trials = sorted((s for s in active if s.is_trial), key=lambda s: s.trial_end_date)
+    paid = [s for s in active if not s.is_trial]
+    monthly, annual = spending_totals(paid)
+    trials = sorted(
+        (s for s in active if s.is_trial and s.trial_end_date >= today),
+        key=lambda s: s.trial_end_date,
+    )
+    upcoming_payments = paid + [s for s in trials if s.converts_to_paid]
+    upcoming_cutoff = today + timedelta(days=30)
     upcoming = sorted(
-        (s for s in active if 0 <= (s.next_renewal_date - today).days <= 30),
+        (s for s in upcoming_payments if today <= s.next_renewal_date <= upcoming_cutoff),
         key=lambda s: s.next_renewal_date,
     )
-    trials_ending_soon = [s for s in trials if (s.trial_end_date - today).days <= 7]
+    trial_cutoff = today + timedelta(days=7)
+    trials_ending_soon = sum(s.trial_end_date <= trial_cutoff for s in trials)
 
-    return render_template(
+    page = render_template(
         "dashboard/index.html",
         subscriptions=subscriptions,
         monthly=monthly,
         annual=annual,
-        active_count=len([s for s in active if not s.is_trial]),
+        active_count=len(paid),
         trials=trials,
         trials_ending_soon=trials_ending_soon,
         upcoming=upcoming,
-        is_preview=True,
+        is_preview=is_preview,
+        today=today,
     )
+    if is_preview:
+        return page
+    return page, {"Cache-Control": "private, no-store"}
