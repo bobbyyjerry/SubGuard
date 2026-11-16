@@ -38,6 +38,21 @@ def next_renewal_on_or_after(anchor, billing_cycle, today):
     return candidate
 
 
+def charges_due(first_charge, billing_cycle, today):
+    """Count billing dates from `first_charge` up to and including `today`."""
+    if first_charge > today:
+        return 0
+    if billing_cycle == "weekly":
+        return (today - first_charge).days // 7 + 1
+
+    step = MONTHS_PER_CYCLE[billing_cycle]
+    months_apart = (today.year - first_charge.year) * 12 + today.month - first_charge.month
+    cycles = months_apart // step
+    if first_charge + relativedelta(months=cycles * step) > today:
+        cycles -= 1
+    return cycles + 1
+
+
 def _advance(subscription, today):
     if subscription.subscription_type == "trial_converts":
         # The trial ended and the first charge happened on that date.

@@ -79,7 +79,60 @@
       </div>
     </section>
     <script type="application/json" id="spending-chart-data">{{ {"currency": currency, "categories": categories}|tojson }}</script>
-  {% else %}
+  {% endif %}
+
+  {% if savings %}
+    <section class="card mt-4" aria-labelledby="cancellation-savings">
+      <div class="card-header py-3">
+        <h2 id="cancellation-savings" class="h6 fw-semibold mb-0">
+          <i class="bi bi-piggy-bank me-2 text-primary" aria-hidden="true"></i>Savings from cancelled subscriptions
+        </h2>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="small text-secondary">Estimated saved so far</div>
+            <div class="h3 fw-bold mb-0">{{ savings.saved|money(currency) }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="small text-secondary">Estimated saving per year</div>
+            <div class="h3 fw-bold mb-0">{{ savings.annual|money(currency) }}</div>
+          </div>
+        </div>
+        <p class="small text-secondary mt-3 mb-0">
+          “Saved so far” counts the charges you would have paid since each cancellation, at the price you entered.
+          These are estimates, not bank records.
+        </p>
+      </div>
+      <div class="table-responsive">
+        <table class="table analytics-table align-middle mb-0">
+          <caption class="visually-hidden">Estimated savings by cancelled subscription in {{ currency }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Subscription</th>
+              <th scope="col" class="text-end">Price</th>
+              <th scope="col" class="text-end">First charge avoided</th>
+              <th scope="col" class="text-end">Charges avoided</th>
+              <th scope="col" class="text-end">Saved so far</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in savings["items"] %}
+              <tr>
+                <th scope="row" class="fw-normal">{{ item.subscription.name }}</th>
+                <td class="text-end text-nowrap">{{ item.subscription.price|money(currency) }}{{ item.subscription.billing_cycle|cycle_suffix }}</td>
+                <td class="text-end text-nowrap">{{ item.subscription.next_renewal_date|nice_date }}</td>
+                <td class="text-end">{{ item.charges }}</td>
+                <td class="text-end text-nowrap">{{ item.saved|money(currency) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+
+  {% if not categories and not savings %}
     <div class="card">
       <div class="card-body text-center py-5">
         <i class="bi bi-bar-chart-line fs-2 text-primary" aria-hidden="true"></i>

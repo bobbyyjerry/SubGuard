@@ -81,10 +81,17 @@ def edit(subscription_id):
 @bp.post("/<int:subscription_id>/status")
 @login_required
 def set_status(subscription_id):
-    messages = {"paused": "Subscription paused.", "active": "Subscription resumed."}
+    messages = {
+        "paused": "Subscription paused.",
+        "active": "Subscription resumed.",
+        "cancelled": "Marked as cancelled in SubGuard. Remember to cancel with the provider too.",
+    }
     status = request.form.get("status")
     if status not in messages:
         abort(400)
+    if status == "cancelled":
+        # Bring the date up to date first: it becomes the first charge this cancellation avoids.
+        advance_renewals_for_user(current_user.id, today_for_user(current_user))
     return _apply_change(db.update(Subscription).values(status=status), subscription_id, messages[status])
 
 
