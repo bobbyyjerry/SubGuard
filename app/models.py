@@ -1,6 +1,9 @@
 """Database models for SubGuard."""
+from datetime import date
+from decimal import Decimal
+
 from flask_login import UserMixin
-from sqlalchemy import String
+from sqlalchemy import ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -19,6 +22,35 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class Subscription(db.Model):
+    __tablename__ = "subscriptions"
+    __table_args__ = {"sqlite_autoincrement": True}
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    price: Mapped[Decimal] = mapped_column(Numeric(9, 2))
+    currency: Mapped[str] = mapped_column(String(3))
+    billing_cycle: Mapped[str] = mapped_column(String(12))
+    next_renewal_date: Mapped[date]
+    category: Mapped[str] = mapped_column(String(20))
+    subscription_type: Mapped[str] = mapped_column(String(20), default="paid")
+    status: Mapped[str] = mapped_column(String(12), default="active")
+    cancellation_url: Mapped[str | None] = mapped_column(String(2048))
+
+    @property
+    def is_trial(self):
+        return self.subscription_type != "paid"
+
+    @property
+    def trial_end_date(self):
+        return self.next_renewal_date if self.is_trial else None
+
+    @property
+    def converts_to_paid(self):
+        return self.subscription_type == "trial_converts"
 
 
 @login_manager.user_loader

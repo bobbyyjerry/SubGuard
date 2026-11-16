@@ -2,7 +2,7 @@
    they show greyed out until their page exists. #}
 {% set nav_items = [
   ("dashboard.index", "Dashboard", "bi-speedometer2"),
-  (None, "Subscriptions", "bi-card-list"),
+  ("subscriptions.index", "Subscriptions", "bi-card-list"),
   (None, "Analytics", "bi-bar-chart-line"),
   (None, "Calendar", "bi-calendar3"),
   (None, "Settings", "bi-gear"),
@@ -25,7 +25,7 @@
         {% for endpoint, label, icon in nav_items %}
           <li class="nav-item">
             {% if endpoint %}
-              {% set is_active = request.endpoint == endpoint %}
+              {% set is_active = request.blueprint == endpoint.split('.')[0] %}
               <a class="nav-link{% if is_active %} active{% endif %}" href="{{ url_for(endpoint) }}"
                  {% if is_active %}aria-current="page"{% endif %}>
                 <i class="bi {{ icon }} me-1" aria-hidden="true"></i>{{ label }}

@@ -50,10 +50,12 @@ def create_app(config_name=None):
     from .routes.auth import bp as auth_bp
     from .routes.dashboard import bp as dashboard_bp
     from .routes.main import bp as main_bp
+    from .routes.subscriptions import bp as subscriptions_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(subscriptions_bp)
 
     @app.cli.command("init-db")
     def init_db():

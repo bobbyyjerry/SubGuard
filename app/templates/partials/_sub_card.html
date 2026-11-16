@@ -20,15 +20,33 @@
           <i class="bi bi-three-dots-vertical"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
-          <li><span class="dropdown-item disabled"><i class="bi bi-pencil me-2"></i>Edit</span></li>
+          {% if is_preview %}
+            <li><span class="dropdown-item disabled"><i class="bi bi-pencil me-2"></i>Edit</span></li>
+          {% else %}
+            <li>
+              <a class="dropdown-item" href="{{ url_for('subscriptions.edit', subscription_id=sub.id) }}">
+                <i class="bi bi-pencil me-2" aria-hidden="true"></i>Edit
+              </a>
+            </li>
+            <li>
+              <form method="post" action="{{ url_for('subscriptions.set_status', subscription_id=sub.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="status" value="{{ 'paused' if is_active else 'active' }}">
+                <button type="submit" class="dropdown-item">
+                  <i class="bi {{ 'bi-pause' if is_active else 'bi-play' }} me-2" aria-hidden="true"></i>{{ 'Pause tracking' if is_active else 'Resume tracking' }}
+                </button>
+              </form>
+            </li>
+          {% endif %}
           {% if sub.cancellation_url %}
             <li><a class="dropdown-item" href="{{ sub.cancellation_url }}" target="_blank" rel="noopener noreferrer">
               <i class="bi bi-box-arrow-up-right me-2"></i>Cancellation page</a></li>
           {% endif %}
           <li><hr class="dropdown-divider"></li>
           <li>
-            <form method="post" action="#" data-demo
-                  data-confirm="Delete “{{ sub.name }}”? This removes it and its reminders permanently."
+            <form method="post" action="{{ '#' if is_preview else url_for('subscriptions.delete', subscription_id=sub.id) }}"
+                  {% if is_preview %}data-demo{% endif %}
+                  data-confirm="Delete “{{ sub.name }}” from SubGuard? This cannot be undone."
                   data-confirm-button="Delete">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>Delete</button>

@@ -38,3 +38,23 @@
 {% macro days_badge(days) %}
   <span class="badge rounded-pill badge-soft-{{ days|urgency }}">{{ days|relative_days }}</span>
 {% endmacro %}
+
+{% macro render_field(field, control_class="form-control") %}
+  <div class="mb-3">
+    {{ field.label(class_="form-label") }}
+    {% set description_id = field.id ~ "-description" %}
+    {{ field(
+      class_=control_class ~ " is-invalid" if field.errors else control_class,
+      aria_invalid="true" if field.errors else false,
+      aria_describedby=description_id if field.errors or field.description else false,
+      **kwargs
+    ) }}
+    {% if field.errors %}
+      <div id="{{ description_id }}" class="invalid-feedback">
+        {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
+      </div>
+    {% elif field.description %}
+      <div id="{{ description_id }}" class="form-text">{{ field.description }}</div>
+    {% endif %}
+  </div>
+{% endmacro %}

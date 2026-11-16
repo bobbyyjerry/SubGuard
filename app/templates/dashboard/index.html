@@ -9,7 +9,10 @@
   {% if is_preview %}
     <div class="alert alert-info d-flex gap-2 align-items-start small" role="status">
       <i class="bi bi-eye mt-1" aria-hidden="true"></i>
-      <div><strong>Preview mode.</strong> This dashboard shows sample data. Your subscriptions will appear here once you can add and save them.</div>
+      <div>
+        <strong>Preview mode.</strong> This dashboard shows sample data.
+        {% if current_user.is_authenticated %}<a href="{{ url_for('subscriptions.index') }}" class="alert-link">Manage your subscriptions</a>{% endif %}
+      </div>
     </div>
   {% endif %}
 
@@ -19,7 +22,11 @@
       <h1 class="h3 fw-bold mb-1">Dashboard</h1>
       <p class="text-secondary mb-0">Here's what your subscriptions are costing you.</p>
     </div>
-    <a href="#" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add subscription</a>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('subscriptions.add') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add subscription</a>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Log in to add a subscription</a>
+    {% endif %}
   </div>
 
   {# ---------- Stat cards ---------- #}

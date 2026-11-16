@@ -1,27 +1,8 @@
 {% extends "base.html" %}
+{% from "partials/_macros.html" import render_field %}
 
 {% set title = "Create your account" if is_registration else "Log in" %}
 {% block title %}{{ title }}{% endblock %}
-
-{% macro render_field(field, autocomplete) %}
-  <div class="mb-3">
-    {{ field.label(class_="form-label") }}
-    {% set description_id = field.id ~ "-description" %}
-    {{ field(
-      class_="form-control is-invalid" if field.errors else "form-control",
-      autocomplete=autocomplete,
-      aria_invalid="true" if field.errors else false,
-      aria_describedby=description_id if field.errors or field.description else false
-    ) }}
-    {% if field.errors %}
-      <div id="{{ description_id }}" class="invalid-feedback">
-        {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
-      </div>
-    {% elif field.description %}
-      <div id="{{ description_id }}" class="form-text">{{ field.description }}</div>
-    {% endif %}
-  </div>
-{% endmacro %}
 
 {% block content %}
 <div class="container py-5">
@@ -32,10 +13,10 @@
           <h1 class="h3 fw-bold mb-4">{{ title }}</h1>
           <form method="post" action="{{ url_for('auth.register' if is_registration else 'auth.login') }}">
             {{ form.hidden_tag() }}
-            {{ render_field(form.email, "username") }}
-            {{ render_field(form.password, "new-password" if is_registration else "current-password") }}
+            {{ render_field(form.email, autocomplete="username") }}
+            {{ render_field(form.password, autocomplete="new-password" if is_registration else "current-password") }}
             {% if is_registration %}
-              {{ render_field(form.confirm_password, "new-password") }}
+              {{ render_field(form.confirm_password, autocomplete="new-password") }}
             {% endif %}
             <button type="submit" class="btn btn-primary w-100 mt-2">
               {{ "Create account" if is_registration else "Log in" }}

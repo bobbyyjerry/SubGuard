@@ -17,8 +17,10 @@ flask run
 ```
 
 Open http://127.0.0.1:5000 and select **Get started** to create an account.
-If you already have a virtual environment and `.env`, start at `flask init-db` after activating it.
+If you already have a virtual environment and `.env`, start at `flask init-db` after activating it. Rerun this command when new tables are added to keep your existing data and create the missing tables.
 The database defaults to `instance/subguard.db`.
+
+After logging in, use **Subscriptions** to add and manage subscriptions or free trials.
 
 ## Run the tests
 

@@ -25,6 +25,14 @@ BILLING_CYCLES = {
     "yearly": ("Yearly", "/yr"),
 }
 
+SUBSCRIPTION_TYPES = {
+    "paid": "Paid subscription",
+    "trial_converts": "Free trial that becomes paid",
+    "trial_ends": "Free trial that ends without a charge",
+}
+
+MAX_SUBSCRIPTION_PRICE = 9_999_999
+
 # key -> (display name, Bootstrap colour)
 STATUSES = {
     "active": ("Active", "success"),

@@ -41,7 +41,7 @@ function setUpConfirmDialogs() {
     if (!pendingForm) return;
     modal.hide();
     if (pendingForm.hasAttribute("data-demo")) {
-      showToast("Preview only: deleting subscriptions arrives on Day 4.");
+      showToast("This is sample data. Manage saved subscriptions on the Subscriptions page.");
       pendingForm = null;
       return;
     }
