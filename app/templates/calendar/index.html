@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar{% endblock %}
+
+{% macro month_link(target, label, icon) %}
+  {% if target %}
+    <a class="btn btn-outline-secondary" href="{{ url_for('calendar.index', month=target.isoformat()[:7]) }}"
+       aria-label="{{ label }}" title="{{ label }}"><i class="bi {{ icon }}" aria-hidden="true"></i></a>
+  {% else %}
+    <button type="button" class="btn btn-outline-secondary" disabled aria-label="{{ label }}">
+      <i class="bi {{ icon }}" aria-hidden="true"></i>
+    </button>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 fw-bold mb-1">Calendar</h1>
+  <p class="text-secondary mb-4">Upcoming subscription renewals and free-trial end dates.</p>
+
+  <section class="card mb-4 overflow-hidden" aria-labelledby="calendar-month">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3 py-3">
+      <h2 id="calendar-month" class="h5 mb-0">{{ month.strftime("%B %Y") }}</h2>
+      <nav class="d-flex gap-1" aria-label="Calendar months">
+        {{ month_link(previous_month, "Previous month", "bi-chevron-left") }}
+        <a class="btn btn-outline-secondary" href="{{ url_for('calendar.index') }}">Today</a>
+        {{ month_link(next_month, "Next month", "bi-chevron-right") }}
+      </nav>
+    </div>
+
+    <table class="table table-bordered calendar-grid mb-0" aria-labelledby="calendar-month">
+      <thead>
+        <tr>
+          {% for weekday in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+            <th scope="col" aria-label="{{ weekday }}">{{ weekday[:3] }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for week in weeks %}
+          <tr>
+            {% for day in week %}
+              {% if day %}
+                {% set date_id = day.isoformat() %}
+                {% set events = events_by_date.get(day, []) %}
+                <td>
+                  <time datetime="{{ date_id }}" class="calendar-date"{% if day == today %} aria-current="date" title="Today"{% endif %}>{{ day.day }}</time>
+                  {% if events %}
+                    <div class="d-none d-md-grid gap-1 mt-1">
+                      {% for subscription in events[:2] %}
+                        {% set tone = "warning" if subscription.is_trial else "primary" %}
+                        <a href="{{ url_for('subscriptions.edit', subscription_id=subscription.id) }}"
+                           class="calendar-event badge-soft-{{ tone }} text-truncate"
+                           title="{{ subscription.name }}">
+                          <i class="bi {{ 'bi-hourglass-split' if subscription.is_trial else 'bi-arrow-repeat' }} me-1" aria-hidden="true"></i>
+                          <span class="visually-hidden">{{ 'Trial ends' if subscription.is_trial else 'Renewal' }} </span>{{ subscription.name }}
+                        </a>
+                      {% endfor %}
+                      {% if events|length > 2 %}
+                        <a href="#events-{{ date_id }}" class="small">+{{ events|length - 2 }} more</a>
+                      {% endif %}
+                    </div>
+                    <a href="#events-{{ date_id }}" class="calendar-event-count badge rounded-pill badge-soft-primary d-md-none"
+                       aria-label="{{ events|length }} {{ 'event' if events|length == 1 else 'events' }} on {{ day|nice_date }}">
+                      {{ events|length }}
+                    </a>
+                  {% endif %}
+                </td>
+              {% else %}
+                <td class="calendar-outside"></td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card" aria-labelledby="month-events">
+    <div class="card-header py-3">
+      <h2 id="month-events" class="h6 fw-semibold mb-0">Events this month</h2>
+    </div>
+    {% for day, events in events_by_date.items() %}
+      <div id="events-{{ day.isoformat() }}" class="calendar-agenda-day px-3 px-sm-4 py-3{% if not loop.first %} border-top{% endif %}">
+        <h3 class="h6 mb-2">
+          <time datetime="{{ day.isoformat() }}">{{ day.strftime("%A") }} · {{ day|nice_date }}</time>
+        </h3>
+        <ul class="list-unstyled mb-0">
+          {% for subscription in events %}
+            <li class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 py-2">
+              <div class="d-flex flex-wrap align-items-baseline gap-2 min-w-0">
+                <a class="fw-semibold text-break" href="{{ url_for('subscriptions.edit', subscription_id=subscription.id) }}">
+                  {{ subscription.name }}
+                </a>
+                {% if subscription.is_trial %}
+                  <span class="badge rounded-pill badge-soft-warning">Trial ends</span>
+                {% else %}
+                  <span class="badge rounded-pill badge-soft-primary">Renewal</span>
+                {% endif %}
+              </div>
+              <span class="text-secondary small">
+                {% if subscription.is_trial %}
+                  {% if subscription.converts_to_paid %}
+                    Then {{ subscription.price|money(subscription.currency) }}{{ subscription.billing_cycle|cycle_suffix }}
+                  {% else %}
+                    No charge
+                  {% endif %}
+                {% else %}
+                  {{ subscription.price|money(subscription.currency) }}
+                {% endif %}
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <div class="card-body text-center py-4">
+        <p class="text-secondary mb-2">No upcoming renewals or trial end dates this month.</p>
+        <a href="{{ url_for('subscriptions.index') }}">Manage subscriptions</a>
+      </div>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

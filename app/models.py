@@ -41,9 +41,12 @@ class Subscription(db.Model):
     cancellation_url: Mapped[str | None] = mapped_column(String(2048))
 
     @classmethod
+    def for_user(cls, user_id):
+        return db.select(cls).filter_by(user_id=user_id).order_by(cls.next_renewal_date, cls.id)
+
+    @classmethod
     def list_for_user(cls, user_id):
-        statement = db.select(cls).filter_by(user_id=user_id).order_by(cls.next_renewal_date, cls.id)
-        return db.session.scalars(statement).all()
+        return db.session.scalars(cls.for_user(user_id)).all()
 
     @property
     def is_trial(self):

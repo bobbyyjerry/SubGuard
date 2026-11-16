@@ -23,6 +23,7 @@ The database defaults to `instance/subguard.db`.
 After logging in, use **Subscriptions** to add and manage subscriptions or free trials.
 The **Dashboard** shows your saved subscriptions, monthly and annual estimates by currency, upcoming payments, and active free trials.
 Open **Analytics** for monthly and annual spending by category. When available, use the currency buttons to switch between estimates.
+Open **Calendar** to browse upcoming renewal dates and free-trial endings by month.
 
 ## Run the tests
 

@@ -208,6 +208,74 @@ body {
   border-bottom: 0;
 }
 
+.calendar-grid {
+  table-layout: fixed;
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--sg-border);
+}
+
+.calendar-grid th {
+  color: var(--sg-muted);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.calendar-grid td {
+  height: 7.5rem;
+  padding: 0.4rem;
+  vertical-align: top;
+}
+
+.calendar-grid .calendar-outside {
+  --bs-table-bg: var(--sg-bg);
+}
+
+.calendar-date {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.65rem;
+  height: 1.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.calendar-date[aria-current="date"] {
+  border-radius: 50%;
+  background-color: var(--sg-primary);
+  color: var(--sg-on-primary);
+}
+
+.calendar-event {
+  display: block;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.35rem;
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.calendar-event:hover {
+  text-decoration: underline;
+}
+
+.calendar-agenda-day {
+  scroll-margin-top: 5rem;
+}
+
+@media (max-width: 767.98px) {
+  .calendar-grid td {
+    height: 3.5rem;
+    padding: 0.2rem;
+    text-align: center;
+  }
+
+  .calendar-event-count {
+    display: block;
+    width: fit-content;
+    margin: 0.15rem auto 0;
+  }
+}
+
 .icon-circle {
   display: inline-grid;
   place-items: center;

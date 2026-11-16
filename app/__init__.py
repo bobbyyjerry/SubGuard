@@ -49,6 +49,7 @@ def create_app(config_name=None):
     # Register blueprints (groups of routes).
     from .routes.analytics import bp as analytics_bp
     from .routes.auth import bp as auth_bp
+    from .routes.calendar import bp as calendar_bp
     from .routes.dashboard import bp as dashboard_bp
     from .routes.main import bp as main_bp
     from .routes.subscriptions import bp as subscriptions_bp
@@ -58,6 +59,7 @@ def create_app(config_name=None):
     app.register_blueprint(auth_bp)
     app.register_blueprint(subscriptions_bp)
     app.register_blueprint(analytics_bp)
+    app.register_blueprint(calendar_bp)
 
     @app.cli.command("init-db")
     def init_db():
