@@ -2,6 +2,7 @@
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
+from ..constants import CATEGORIES, STATUSES
 from ..extensions import db
 from ..forms import SubscriptionForm
 from ..models import Subscription
@@ -9,6 +10,38 @@ from ..services.renewals import advance_renewals_for_user
 from ..services.timezones import today_for_user
 
 bp = Blueprint("subscriptions", __name__, url_prefix="/subscriptions")
+
+KINDS = {"paid": "Paid", "trial": "Free trial"}
+SORTS = {"date": "Next date", "name": "Name (A to Z)"}
+
+
+def _filters():
+    """Read the filter choices from the address, ignoring anything not on the lists."""
+    def choice(name, allowed):
+        value = request.args.get(name, "")
+        return value if value in allowed else ""
+
+    return {
+        "q": request.args.get("q", "").strip()[:120],
+        "status": choice("status", STATUSES),
+        "kind": choice("kind", KINDS),
+        "category": choice("category", CATEGORIES),
+        "sort": choice("sort", SORTS) or "date",
+    }
+
+
+def _apply_filters(subscriptions, filters):
+    search = filters["q"].casefold()
+    matches = [
+        subscription for subscription in subscriptions
+        if search in subscription.name.casefold()
+        and filters["status"] in ("", subscription.status)
+        and filters["category"] in ("", subscription.category)
+        and filters["kind"] in ("", "trial" if subscription.is_trial else "paid")
+    ]
+    if filters["sort"] == "name":
+        matches.sort(key=lambda subscription: subscription.name.casefold())
+    return matches
 
 
 def _owned_record(subscription_id):
@@ -48,8 +81,21 @@ def _apply_change(statement, subscription_id, message):
 def index():
     today = today_for_user(current_user)
     advance_renewals_for_user(current_user.id, today)
-    subscriptions = Subscription.list_for_user(current_user.id)
-    return render_template("subscriptions/index.html", subscriptions=subscriptions, is_preview=False, today=today)
+    everything = Subscription.list_for_user(current_user.id)
+    filters = _filters()
+    return render_template(
+        "subscriptions/index.html",
+        subscriptions=_apply_filters(everything, filters),
+        total=len(everything),
+        filters=filters,
+        filtered=any(filters[name] for name in ("q", "status", "kind", "category")),
+        status_options=[(key, label) for key, (label, _) in STATUSES.items()],
+        kind_options=list(KINDS.items()),
+        category_options=[(key, label) for key, (label, _) in CATEGORIES.items()],
+        sort_options=list(SORTS.items()),
+        is_preview=False,
+        today=today,
+    )
 
 
 @bp.route("/new", methods=["GET", "POST"])

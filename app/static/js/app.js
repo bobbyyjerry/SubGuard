@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setUpConfirmDialogs();
   setUpFilterPills();
   setUpTrialOnlyFields();
+  setUpAutoSubmitForms();
 
   // Turn on Bootstrap tooltips (elements with data-bs-toggle="tooltip").
   document
@@ -91,6 +92,19 @@ function setUpTrialOnlyFields() {
     };
     typeSelect.addEventListener("change", update);
     update();
+  });
+}
+
+/**
+ * <form data-auto-submit> submits as soon as one of its dropdowns changes,
+ * so filters apply without pressing the button. The button still works
+ * for the search box and when JavaScript is off.
+ */
+function setUpAutoSubmitForms() {
+  document.querySelectorAll("form[data-auto-submit]").forEach((form) => {
+    form.querySelectorAll("select").forEach((select) => {
+      select.addEventListener("change", () => form.requestSubmit());
+    });
   });
 }
 

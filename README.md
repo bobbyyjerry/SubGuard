@@ -20,7 +20,7 @@ Open http://127.0.0.1:5000 and select **Get started** to create an account.
 If you already have a virtual environment and `.env`, start at `flask init-db` after activating it. Rerun this command after updating SubGuard: it keeps your existing data and creates any missing tables and columns.
 The database defaults to `instance/subguard.db`.
 
-After logging in, use **Subscriptions** to add and manage subscriptions or free trials. A free trial can also have an optional start date, which shows how long the trial runs.
+After logging in, use **Subscriptions** to add and manage subscriptions or free trials. A free trial can also have an optional start date, which shows how long the trial runs. The Subscriptions page can be searched by name, filtered by status, type, and category, and sorted by next date or name.
 The **Dashboard** shows your saved subscriptions, monthly and annual estimates by currency, upcoming payments, and active free trials.
 Open **Analytics** for monthly and annual spending by category. When available, use the currency buttons to switch between estimates.
 Open **Calendar** to browse upcoming renewal dates and free-trial endings by month.

@@ -2,6 +2,18 @@
 
 {% block title %}Subscriptions{% endblock %}
 
+{% macro filter_select(name, label, options, any_label) %}
+  <div class="col-6 col-md-3 col-lg-2">
+    <label class="form-label small text-secondary mb-1" for="filter-{{ name }}">{{ label }}</label>
+    <select class="form-select form-select-sm" id="filter-{{ name }}" name="{{ name }}">
+      {% if any_label %}<option value="">{{ any_label }}</option>{% endif %}
+      {% for value, text in options %}
+        <option value="{{ value }}"{% if filters[name] == value %} selected{% endif %}>{{ text }}</option>
+      {% endfor %}
+    </select>
+  </div>
+{% endmacro %}
+
 {% block content %}
 <div class="container py-4">
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
@@ -11,6 +23,37 @@
     </a>
   </div>
 
+  {% if total %}
+    {# A GET form: the choices go in the address, so a filtered view can be bookmarked. #}
+    <form method="get" action="{{ url_for('subscriptions.index') }}" class="card mb-4" role="search"
+          aria-label="Filter subscriptions" data-auto-submit>
+      <div class="card-body">
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label small text-secondary mb-1" for="filter-q">Search by name</label>
+            <input type="search" class="form-control form-control-sm" id="filter-q" name="q" value="{{ filters.q }}"
+                   maxlength="120" placeholder="e.g. Netflix" autocomplete="off">
+          </div>
+          {{ filter_select("status", "Status", status_options, "Any status") }}
+          {{ filter_select("kind", "Type", kind_options, "Any type") }}
+          {{ filter_select("category", "Category", category_options, "Any category") }}
+          {{ filter_select("sort", "Sort by", sort_options, none) }}
+          <div class="col-12 col-lg-auto d-flex gap-2">
+            <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+            {% if filtered %}
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('subscriptions.index') }}">Clear filters</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+    {% if filtered %}
+      <p class="small text-secondary" id="filter-summary" role="status">
+        Showing {{ subscriptions|length }} of {{ total }} {{ "subscription" if total == 1 else "subscriptions" }}.
+      </p>
+    {% endif %}
+  {% endif %}
+
   {% if subscriptions %}
     <div class="row g-3">
       {% for sub in subscriptions %}
@@ -18,6 +61,15 @@
           {% include "partials/_sub_card.html" %}
         </div>
       {% endfor %}
+    </div>
+  {% elif total %}
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-funnel fs-2 text-primary" aria-hidden="true"></i>
+        <h2 class="h5 fw-semibold mt-2">No subscriptions match these filters</h2>
+        <p class="text-secondary mb-3">Try a different search or clear the filters.</p>
+        <a class="btn btn-outline-secondary" href="{{ url_for('subscriptions.index') }}">Clear filters</a>
+      </div>
     </div>
   {% else %}
     <div class="card">
