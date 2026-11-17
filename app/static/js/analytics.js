@@ -12,17 +12,22 @@ function renderSpendingCharts() {
   const textColor = themeColor("--sg-text");
   const categoryColors = {
     streaming: themeColor("--sg-primary"),
-    music: "#a78bfa",
-    software: "#60a5fa",
-    cloud: "#2dd4bf",
-    gaming: "#fb7185",
-    news: "#fbbf24",
-    fitness: "#a3e635",
-    education: "#fb923c",
-    other: "#94a3b8",
+    music: "#a7806f",
+    software: "#7c8da5",
+    cloud: "#789b8e",
+    gaming: "#a87985",
+    news: "#a48c65",
+    fitness: "#89986e",
+    education: "#9683a8",
+    other: "#918790",
   };
   const labels = categories.map(({ label }) => label);
   const backgroundColor = categories.map(({ key }) => categoryColors[key]);
+  const tooltipColors = {
+    backgroundColor: themeColor("--sg-primary-deep"),
+    titleColor: themeColor("--sg-on-primary"),
+    bodyColor: themeColor("--sg-on-primary"),
+  };
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -48,7 +53,10 @@ function renderSpendingCharts() {
       cutout: "66%",
       plugins: {
         legend: { position: "bottom", labels: { color: textColor, usePointStyle: true, boxWidth: 8 } },
-        tooltip: { callbacks: { label: (item) => `${item.label} · ${currencyFormat.format(item.raw)}` } },
+        tooltip: {
+          ...tooltipColors,
+          callbacks: { label: (item) => `${item.label} · ${currencyFormat.format(item.raw)}` },
+        },
       },
     },
   });
@@ -77,7 +85,7 @@ function renderSpendingCharts() {
       },
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: (item) => currencyFormat.format(item.raw) } },
+        tooltip: { ...tooltipColors, callbacks: { label: (item) => currencyFormat.format(item.raw) } },
       },
     },
   });

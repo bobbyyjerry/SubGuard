@@ -1,85 +1,87 @@
-/* =========================================================
-   SubGuard styles: a small custom layer on top of Bootstrap 5.
-   Theme: MIDNIGHT NAVY + ELECTRIC CYAN (dark).
-
-   base.html sets <html data-bs-theme="dark">, so Bootstrap's own
-   components (dropdowns, modals, form fields, close buttons) use
-   their dark versions. Below we swap Bootstrap's default greys for
-   our navy palette and its blue for our cyan.
-
-   All colours live in the variables in the first block
-   ("design tokens"), so the whole look changes in one place.
-   ========================================================= */
+/* SubGuard's charcoal and plum palette extends Bootstrap's dark theme. */
 
 :root,
 :root[data-bs-theme="dark"] {
   color-scheme: dark;
 
-  /* ---- Brand: electric cyan ---- */
-  --sg-primary: #22d3ee;           /* electric cyan */
-  --sg-primary-hover: #67e8f9;     /* lighter cyan for hover */
-  --sg-primary-deep: #0ea5e9;      /* deeper cyan-blue for gradients */
-  --sg-primary-soft: rgba(34, 211, 238, 0.12);
-  --sg-primary-line: rgba(34, 211, 238, 0.35);
-  --sg-glow: 0 0 0 1px rgba(34, 211, 238, 0.35), 0 8px 28px rgba(34, 211, 238, 0.25);
-  --sg-on-primary: #04111f;        /* text on cyan: near-black navy */
+  --sg-primary-rgb: 188, 147, 173;
+  --sg-primary: rgb(var(--sg-primary-rgb));
+  --sg-primary-hover-rgb: 208, 173, 196;
+  --sg-primary-hover: rgb(var(--sg-primary-hover-rgb));
+  --sg-primary-deep: #302234;
+  --sg-primary-fill: #58384f;
+  --sg-primary-fill-hover: #694760;
+  --sg-primary-soft: #352733;
+  --sg-primary-line: #90657f;
+  --sg-focus: rgba(var(--sg-primary-rgb), 0.24);
+  --sg-on-primary: #eee4ec;
 
-  /* ---- Surfaces: midnight navy ---- */
-  --sg-bg: #070d1f;                /* page background */
-  --sg-bg-deep: #050a18;           /* footer, deepest areas */
-  --sg-surface: #0d1630;           /* cards */
-  --sg-surface-2: #131e3e;         /* raised: dropdowns, hover */
-  --sg-input-bg: #0a1228;          /* form fields (slightly inset) */
-  --sg-input-border: #2c3d6e;      /* brighter than card borders so fields stand out */
-  --sg-border: #1e2b52;
-  --sg-text: #e6edf7;
-  --sg-muted: #8b9ab8;             /* ~6:1 contrast on cards */
+  --sg-bg-rgb: 23, 20, 25;
+  --sg-bg: rgb(var(--sg-bg-rgb));
+  --sg-bg-deep: #120f14;
+  --sg-surface: #211c24;
+  --sg-surface-2: #2b242e;
+  --sg-input-bg: #1c181f;
+  --sg-input-border: #827483;
+  --sg-border: #413644;
+  --sg-text: #d6cbd4;
+  --sg-muted: #b0a0ae;
+  --sg-heading: #e7dce6;
 
-  /* ---- Status colours (tuned to read well on navy) ---- */
-  --sg-success: #34d399;
-  --sg-success-soft: rgba(52, 211, 153, 0.12);
-  --sg-warning: #fbbf24;
-  --sg-warning-soft: rgba(251, 191, 36, 0.12);
-  --sg-danger: #f87171;
-  --sg-danger-soft: rgba(248, 113, 113, 0.12);
+  --sg-success: #9cb69f;
+  --sg-success-soft: #25332c;
+  --sg-warning: #c0a378;
+  --sg-warning-soft: #382f23;
+  --sg-danger: #d09aa5;
+  --sg-danger-soft: #382730;
 
   --sg-radius: 0.875rem;
-  --sg-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
+  --sg-shadow: 0 2px 4px rgba(10, 7, 11, 0.22), 0 8px 24px rgba(10, 7, 11, 0.21);
 
-  /* ---- Feed our tokens into Bootstrap's variables ---- */
   --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --bs-body-bg: var(--sg-bg);
-  --bs-body-bg-rgb: 7, 13, 31;
+  --bs-body-bg-rgb: var(--sg-bg-rgb);
   --bs-body-color: var(--sg-text);
-  --bs-body-color-rgb: 230, 237, 247;
-  --bs-emphasis-color: #ffffff;
-  --bs-emphasis-color-rgb: 255, 255, 255;
-  --bs-heading-color: #f4f8ff;
+  --bs-body-color-rgb: 214, 203, 212;
+  --bs-emphasis-color: var(--sg-heading);
+  --bs-emphasis-color-rgb: 231, 220, 230;
+  --bs-heading-color: var(--sg-heading);
   --bs-secondary-color: var(--sg-muted);
-  --bs-secondary-rgb: 139, 154, 184;      /* .text-secondary */
+  --bs-secondary-rgb: 176, 160, 174;
   --bs-secondary-bg: var(--sg-surface-2);
   --bs-tertiary-bg: var(--sg-surface);
   --bs-border-color: var(--sg-border);
-  --bs-border-color-translucent: rgba(148, 170, 220, 0.14);
+  --bs-border-color-translucent: rgba(var(--sg-primary-rgb), 0.14);
 
   --bs-primary: var(--sg-primary);
-  --bs-primary-rgb: 34, 211, 238;
-  --bs-primary-text-emphasis: #a5f3fc;
-  --bs-primary-bg-subtle: rgba(34, 211, 238, 0.1);
+  --bs-primary-rgb: var(--sg-primary-rgb);
+  --bs-primary-text-emphasis: var(--sg-primary);
+  --bs-primary-bg-subtle: var(--sg-primary-soft);
   --bs-primary-border-subtle: var(--sg-primary-line);
-  --bs-info-rgb: 34, 211, 238;
-  --bs-info-text-emphasis: #a5f3fc;
-  --bs-info-bg-subtle: rgba(34, 211, 238, 0.08);
-  --bs-info-border-subtle: rgba(34, 211, 238, 0.3);
-  --bs-success-rgb: 52, 211, 153;
-  --bs-warning-rgb: 251, 191, 36;
-  --bs-danger-rgb: 248, 113, 113;
+  --bs-info-rgb: var(--sg-primary-rgb);
+  --bs-info-text-emphasis: var(--sg-primary);
+  --bs-info-bg-subtle: var(--sg-primary-soft);
+  --bs-info-border-subtle: var(--sg-primary-line);
+  --bs-success-rgb: 156, 182, 159;
+  --bs-warning-rgb: 192, 163, 120;
+  --bs-danger-rgb: 208, 154, 165;
+  --bs-success-text-emphasis: var(--sg-success);
+  --bs-warning-text-emphasis: var(--sg-warning);
+  --bs-danger-text-emphasis: var(--sg-danger);
+  --bs-success-bg-subtle: var(--sg-success-soft);
+  --bs-warning-bg-subtle: var(--sg-warning-soft);
+  --bs-danger-bg-subtle: var(--sg-danger-soft);
+  --bs-success-border-subtle: #475e4c;
+  --bs-warning-border-subtle: #6c593e;
+  --bs-danger-border-subtle: #6f4b57;
+  --bs-form-invalid-color: var(--sg-danger);
+  --bs-form-invalid-border-color: var(--sg-danger);
 
   --bs-link-color: var(--sg-primary);
-  --bs-link-color-rgb: 34, 211, 238;
+  --bs-link-color-rgb: var(--sg-primary-rgb);
   --bs-link-hover-color: var(--sg-primary-hover);
-  --bs-link-hover-color-rgb: 103, 232, 249;
-  --bs-focus-ring-color: rgba(34, 211, 238, 0.35);
+  --bs-link-hover-color-rgb: var(--sg-primary-hover-rgb);
+  --bs-focus-ring-color: var(--sg-focus);
 }
 
 body {
@@ -87,72 +89,79 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: rgba(34, 211, 238, 0.35); color: #fff; }
+::selection { background: var(--sg-primary-soft); color: var(--sg-heading); }
 
 /* ---------- Buttons ---------- */
 .btn { border-radius: 0.6rem; font-weight: 500; }
 
 .btn-primary {
   --bs-btn-color: var(--sg-on-primary);
-  --bs-btn-bg: var(--sg-primary);
-  --bs-btn-border-color: var(--sg-primary);
+  --bs-btn-bg: var(--sg-primary-fill);
+  --bs-btn-border-color: var(--sg-primary-line);
   --bs-btn-hover-color: var(--sg-on-primary);
-  --bs-btn-hover-bg: var(--sg-primary-hover);
+  --bs-btn-hover-bg: var(--sg-primary-fill-hover);
   --bs-btn-hover-border-color: var(--sg-primary-hover);
   --bs-btn-active-color: var(--sg-on-primary);
-  --bs-btn-active-bg: var(--sg-primary-hover);
+  --bs-btn-active-bg: var(--sg-primary-fill-hover);
   --bs-btn-active-border-color: var(--sg-primary-hover);
   --bs-btn-disabled-color: var(--sg-on-primary);
-  --bs-btn-disabled-bg: var(--sg-primary);
-  --bs-btn-disabled-border-color: var(--sg-primary);
-  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+  --bs-btn-disabled-bg: var(--sg-primary-fill);
+  --bs-btn-disabled-border-color: var(--sg-primary-line);
+  --bs-btn-focus-shadow-rgb: var(--sg-primary-rgb);
   font-weight: 600;
 }
-.btn-primary:hover { box-shadow: var(--sg-glow); }
 
 .btn-outline-primary {
   --bs-btn-color: var(--sg-primary);
   --bs-btn-border-color: var(--sg-primary-line);
   --bs-btn-hover-color: var(--sg-on-primary);
-  --bs-btn-hover-bg: var(--sg-primary);
+  --bs-btn-hover-bg: var(--sg-primary-fill);
   --bs-btn-hover-border-color: var(--sg-primary);
   --bs-btn-active-color: var(--sg-on-primary);
-  --bs-btn-active-bg: var(--sg-primary);
+  --bs-btn-active-bg: var(--sg-primary-fill);
   --bs-btn-active-border-color: var(--sg-primary);
-  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+  --bs-btn-focus-shadow-rgb: var(--sg-primary-rgb);
 }
 
-/* "Light" and "secondary" buttons become quiet navy buttons */
 .btn-light {
   --bs-btn-color: var(--sg-text);
   --bs-btn-bg: var(--sg-surface-2);
   --bs-btn-border-color: var(--sg-border);
-  --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #1a2750;
+  --bs-btn-hover-color: var(--sg-heading);
+  --bs-btn-hover-bg: var(--sg-primary-soft);
   --bs-btn-hover-border-color: var(--sg-primary-line);
-  --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: #1a2750;
+  --bs-btn-active-color: var(--sg-heading);
+  --bs-btn-active-bg: var(--sg-primary-soft);
   --bs-btn-active-border-color: var(--sg-primary-line);
-  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+  --bs-btn-focus-shadow-rgb: var(--sg-primary-rgb);
 }
 
 .btn-outline-secondary {
   --bs-btn-color: var(--sg-text);
-  --bs-btn-border-color: var(--sg-border);
-  --bs-btn-hover-color: #fff;
+  --bs-btn-border-color: var(--sg-input-border);
+  --bs-btn-hover-color: var(--sg-heading);
   --bs-btn-hover-bg: var(--sg-surface-2);
   --bs-btn-hover-border-color: var(--sg-primary-line);
-  --bs-btn-active-color: #fff;
+  --bs-btn-active-color: var(--sg-heading);
   --bs-btn-active-bg: var(--sg-surface-2);
   --bs-btn-active-border-color: var(--sg-primary-line);
-  --bs-btn-focus-shadow-rgb: 34, 211, 238;
+  --bs-btn-focus-shadow-rgb: var(--sg-primary-rgb);
+}
+
+.btn-danger {
+  --bs-btn-color: var(--sg-on-primary);
+  --bs-btn-bg: #693b48;
+  --bs-btn-border-color: #986575;
+  --bs-btn-hover-bg: #7a4957;
+  --bs-btn-hover-border-color: var(--sg-danger);
+  --bs-btn-active-bg: #7a4957;
+  --bs-btn-active-border-color: var(--sg-danger);
+  --bs-btn-focus-shadow-rgb: var(--bs-danger-rgb);
 }
 
 /* ---------- Navbar ---------- */
-/* The navbar markup uses .bg-white (a Bootstrap utility with !important),
-   so we need !important here to replace it with translucent navy. */
 .navbar.bg-white {
-  background-color: rgba(7, 13, 31, 0.82) !important;
+  background-color: rgba(var(--sg-bg-rgb), 0.94) !important;
   backdrop-filter: saturate(140%) blur(10px);
   -webkit-backdrop-filter: saturate(140%) blur(10px);
 }
@@ -164,13 +173,13 @@ body {
   width: 2rem;
   height: 2rem;
   border-radius: 0.6rem;
-  background: linear-gradient(135deg, var(--sg-primary), var(--sg-primary-deep));
+  background: linear-gradient(135deg, var(--sg-primary-fill), var(--sg-primary-deep));
+  box-shadow: inset 0 0 0 1px var(--sg-primary-line);
   color: var(--sg-on-primary);
   font-size: 1.05rem;
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
 }
 
-.navbar-brand { color: #fff; }
+.navbar-brand { color: var(--sg-heading); }
 .navbar .nav-link { font-weight: 500; color: var(--sg-muted); }
 .navbar .nav-link:hover { color: var(--sg-text); }
 .navbar .nav-link.active { color: var(--sg-primary); }
@@ -242,7 +251,8 @@ body {
 
 .calendar-date[aria-current="date"] {
   border-radius: 50%;
-  background-color: var(--sg-primary);
+  background-color: var(--sg-primary-fill);
+  box-shadow: inset 0 0 0 1px var(--sg-primary-line);
   color: var(--sg-on-primary);
 }
 
@@ -286,7 +296,6 @@ body {
   background: var(--sg-primary-soft);
   color: var(--sg-primary);
   font-size: 1.1rem;
-  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.18);
 }
 
 /* Stat cards on the dashboard */
@@ -295,7 +304,7 @@ body {
   font-size: clamp(1.15rem, 1rem + 1vw, 1.6rem);
   font-weight: 700;
   line-height: 1.2;
-  color: #fff;
+  color: var(--sg-heading);
 }
 
 /* Bootstrap cards allow breaking inside words; for stats we only want
@@ -307,14 +316,14 @@ body {
 .sub-card:hover { box-shadow: var(--sg-shadow), 0 0 0 1px var(--sg-primary-line); }
 .sub-card.urgency-warning { border-left-color: var(--sg-warning); }
 .sub-card.urgency-danger { border-left-color: var(--sg-danger); }
-.sub-card .sub-price { font-size: 1.35rem; font-weight: 700; color: #fff; }
-.sub-card.is-inactive { opacity: 0.6; }
+.sub-card .sub-price { font-size: 1.35rem; font-weight: 700; color: var(--sg-heading); }
+.sub-card.is-inactive { --bs-card-bg: var(--sg-surface-2); }
 
 /* Soft badges (tinted, lighter than Bootstrap's solid ones) */
 .badge-soft-success { background: var(--sg-success-soft); color: var(--sg-success); }
 .badge-soft-warning { background: var(--sg-warning-soft); color: var(--sg-warning); }
 .badge-soft-danger { background: var(--sg-danger-soft); color: var(--sg-danger); }
-.badge-soft-secondary { background: rgba(139, 154, 184, 0.12); color: #aab6cf; }
+.badge-soft-secondary { background: var(--sg-surface-2); color: var(--sg-muted); }
 .badge-soft-primary { background: var(--sg-primary-soft); color: var(--sg-primary); }
 .badge { font-weight: 600; }
 
@@ -332,34 +341,28 @@ body {
 
 /* Progress bars */
 .progress {
-  --bs-progress-bg: #1a2547;
+  --bs-progress-bg: var(--sg-primary-soft);
   --bs-progress-bar-bg: var(--sg-primary);
 }
 
 /* ---------- Dropdowns, modals, alerts, toasts ---------- */
 .dropdown-menu {
-  --bs-dropdown-bg: var(--sg-surface-2);
+  --bs-dropdown-bg: var(--sg-surface);
   --bs-dropdown-border-color: var(--sg-border);
   --bs-dropdown-link-color: var(--sg-text);
-  --bs-dropdown-link-hover-color: #fff;
-  --bs-dropdown-link-hover-bg: rgba(34, 211, 238, 0.08);
+  --bs-dropdown-link-hover-color: var(--sg-heading);
+  --bs-dropdown-link-hover-bg: var(--sg-primary-soft);
   --bs-dropdown-link-active-color: var(--sg-on-primary);
-  --bs-dropdown-link-active-bg: var(--sg-primary);
+  --bs-dropdown-link-active-bg: var(--sg-primary-fill);
   --bs-dropdown-divider-bg: var(--sg-border);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--sg-shadow);
 }
 
 .modal {
   --bs-modal-bg: var(--sg-surface);
   --bs-modal-border-color: var(--sg-border);
 }
-.modal-backdrop { --bs-backdrop-bg: #01040c; --bs-backdrop-opacity: 0.7; }
-
-.alert-info {
-  --bs-alert-color: #a5f3fc;
-  --bs-alert-bg: rgba(34, 211, 238, 0.07);
-  --bs-alert-border-color: rgba(34, 211, 238, 0.28);
-}
+.modal-backdrop { --bs-backdrop-bg: var(--sg-bg-deep); --bs-backdrop-opacity: 0.7; }
 
 .toast.text-bg-dark {
   background-color: var(--sg-surface-2) !important;
@@ -374,49 +377,33 @@ body {
   border-color: var(--sg-input-border);
   color: var(--sg-text);
 }
-.form-control::placeholder { color: #5f6f92; }
+.form-control::placeholder { color: var(--sg-muted); }
 .form-control:focus,
 .form-select:focus {
   background-color: var(--sg-input-bg);
   border-color: var(--sg-primary);
   color: var(--sg-text);
-  box-shadow: 0 0 0 0.25rem rgba(34, 211, 238, 0.2);
+  box-shadow: 0 0 0 0.25rem var(--sg-focus);
 }
 .form-check-input:checked {
-  background-color: var(--sg-primary);
+  background-color: var(--sg-primary-fill);
   border-color: var(--sg-primary);
 }
-.form-check-input:focus { box-shadow: 0 0 0 0.25rem rgba(34, 211, 238, 0.2); }
+.form-check-input:focus { box-shadow: 0 0 0 0.25rem var(--sg-focus); }
 
 /* ---------- Landing page ---------- */
 .hero {
-  position: relative;
   background:
-    radial-gradient(55rem 28rem at 85% -10%, rgba(34, 211, 238, 0.18), transparent 60%),
-    radial-gradient(40rem 25rem at -10% 110%, rgba(14, 165, 233, 0.12), transparent 60%),
+    radial-gradient(55rem 34rem at 89% 8%, #302333, transparent 74%),
+    radial-gradient(40rem 25rem at -5% 110%, #241e27, transparent 72%),
     var(--sg-bg);
-  overflow: hidden;
 }
-/* Faint "circuit grid" behind the hero for the electric feel */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(34, 211, 238, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse at 70% 30%, #000 20%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse at 70% 30%, #000 20%, transparent 70%);
-  pointer-events: none;
-}
-.hero > .container { position: relative; }
 
-.hero h1 { letter-spacing: -0.02em; color: #fff; }
+.hero h1 { letter-spacing: -0.02em; }
 
 .hero-preview .card { max-width: 24rem; text-align: left; }
 .hero-preview .card + .card { margin-top: 0.75rem; }
-.hero-preview .card:first-child { box-shadow: var(--sg-shadow), 0 0 0 1px var(--sg-primary-line), 0 0 32px rgba(34, 211, 238, 0.15); }
+.hero-preview .card:first-child { --bs-card-border-color: var(--sg-primary-line); }
 
 .feature-icon {
   display: inline-grid;
@@ -427,7 +414,6 @@ body {
   background: var(--sg-primary-soft);
   color: var(--sg-primary);
   font-size: 1.35rem;
-  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.2);
 }
 
 .step-number {
@@ -436,32 +422,22 @@ body {
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
-  background: var(--sg-primary);
+  background: var(--sg-primary-fill);
   color: var(--sg-on-primary);
   font-weight: 700;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
 }
 
 .cta-band {
-  background:
-    radial-gradient(30rem 12rem at 100% 0%, rgba(34, 211, 238, 0.22), transparent 70%),
-    linear-gradient(135deg, #0b1838, #0a2547);
-  color: var(--sg-text);
-  border: 1px solid var(--sg-primary-line);
+  --bs-heading-color: var(--sg-on-primary);
+  background: linear-gradient(120deg, var(--sg-primary-deep), var(--sg-primary-fill));
+  color: var(--sg-on-primary);
   border-radius: var(--sg-radius);
-  box-shadow: 0 0 40px rgba(34, 211, 238, 0.12);
+  box-shadow: var(--sg-shadow);
 }
-/* The CTA button is marked "btn-light text-primary" in the HTML;
-   on navy we show it as the bright cyan primary button instead. */
 .cta-band .btn-light {
-  --bs-btn-bg: var(--sg-primary);
-  --bs-btn-border-color: var(--sg-primary);
-  --bs-btn-hover-bg: var(--sg-primary-hover);
-  --bs-btn-hover-border-color: var(--sg-primary-hover);
-  --bs-btn-active-bg: var(--sg-primary-hover);
-  color: var(--sg-on-primary) !important;
+  --bs-btn-bg: var(--sg-surface);
+  --bs-btn-border-color: var(--sg-surface);
 }
-.cta-band .btn-light:hover { box-shadow: var(--sg-glow); }
 
 /* ---------- Footer ---------- */
 .site-footer { border-top: 1px solid var(--sg-border); background: var(--sg-bg-deep); }
