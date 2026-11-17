@@ -27,6 +27,10 @@
               <div class="col-sm-6">{{ render_field(form.billing_cycle, "form-select") }}</div>
               <div class="col-sm-6">{{ render_field(form.next_renewal_date) }}</div>
             </div>
+            {# Shown only while a free-trial type is selected (see app.js). #}
+            <div class="row" data-trial-only="#{{ form.subscription_type.id }}">
+              <div class="col-sm-6">{{ render_field(form.trial_start_date) }}</div>
+            </div>
             {{ render_field(form.cancellation_url) }}
             <div class="d-flex gap-2 mt-4">
               <button type="submit" class="btn btn-primary">{{ "Save changes" if subscription else "Add subscription" }}</button>

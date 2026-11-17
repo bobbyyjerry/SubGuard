@@ -63,6 +63,8 @@ class Subscription(db.Model):
     # The date the user entered. Later renewals are counted from it so
     # month-end dates don't drift (see services/renewals.py).
     billing_anchor_date: Mapped[date | None]
+    # Optional, free trials only. The trial's end date is next_renewal_date.
+    trial_start_date: Mapped[date | None]
     category: Mapped[str] = mapped_column(String(20))
     subscription_type: Mapped[str] = mapped_column(String(20), default="paid")
     status: Mapped[str] = mapped_column(String(12), default="active")
@@ -83,6 +85,13 @@ class Subscription(db.Model):
     @property
     def trial_end_date(self):
         return self.next_renewal_date if self.is_trial else None
+
+    @property
+    def trial_length_days(self):
+        """Whole days from the trial's start to its end, when a start date was entered."""
+        if not self.is_trial or self.trial_start_date is None:
+            return None
+        return (self.next_renewal_date - self.trial_start_date).days
 
     @property
     def converts_to_paid(self):

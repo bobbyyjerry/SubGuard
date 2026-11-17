@@ -4,6 +4,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   setUpConfirmDialogs();
   setUpFilterPills();
+  setUpTrialOnlyFields();
 
   // Turn on Bootstrap tooltips (elements with data-bs-toggle="tooltip").
   document
@@ -73,6 +74,23 @@ function setUpFilterPills() {
         });
       });
     });
+  });
+}
+
+/**
+ * Trial-only fields: <div data-trial-only="#typeSelectId"> is hidden
+ * while the subscription type is "paid". The server ignores the value
+ * for paid subscriptions either way.
+ */
+function setUpTrialOnlyFields() {
+  document.querySelectorAll("[data-trial-only]").forEach((wrapper) => {
+    const typeSelect = document.querySelector(wrapper.dataset.trialOnly);
+    if (!typeSelect) return;
+    const update = () => {
+      wrapper.hidden = typeSelect.value === "paid";
+    };
+    typeSelect.addEventListener("change", update);
+    update();
   });
 }
 

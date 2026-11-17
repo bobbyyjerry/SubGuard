@@ -24,6 +24,8 @@ def _form_values(form):
         "next_renewal_date": form.next_renewal_date.data,
         "category": form.category.data,
         "subscription_type": form.subscription_type.data,
+        # Only trials have a start date; switching to paid clears it.
+        "trial_start_date": form.trial_start_date.data if form.subscription_type.data != "paid" else None,
         "cancellation_url": form.cancellation_url.data or None,
     }
 

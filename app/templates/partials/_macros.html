@@ -39,6 +39,14 @@
   <span class="badge rounded-pill badge-soft-{{ days|urgency }}">{{ days|relative_days }}</span>
 {% endmacro %}
 
+{# "Started 1 Nov 2026 · 14-day trial" for a trial with a start date; nothing otherwise. #}
+{% macro trial_period(sub) %}
+  {%- if sub.is_trial and sub.trial_start_date -%}
+    Started {{ sub.trial_start_date|nice_date }}
+    {%- if sub.trial_length_days >= 1 %} · {{ sub.trial_length_days }}-day trial{% endif %}
+  {%- endif -%}
+{% endmacro %}
+
 {% macro render_field(field, control_class="form-control") %}
   <div class="mb-3">
     {{ field.label(class_="form-label") }}

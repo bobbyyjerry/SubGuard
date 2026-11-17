@@ -74,6 +74,7 @@ def create_app(config_name=None):
         # create_all() never changes existing tables, so add newer columns here.
         newer_columns = (
             ("subscriptions", "billing_anchor_date", "DATE"),
+            ("subscriptions", "trial_start_date", "DATE"),
             ("user_preferences", "currency", "VARCHAR(3)"),
         )
         for table, name, column_type in newer_columns:

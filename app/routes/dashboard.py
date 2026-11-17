@@ -24,6 +24,8 @@ def _sample_subscriptions(today):
             status="active",
             is_trial=False,
             trial_end_date=None,
+            trial_start_date=None,
+            trial_length_days=None,
             converts_to_paid=False,
             cancellation_url=None,
         )
@@ -41,9 +43,11 @@ def _sample_subscriptions(today):
         sub(id=6, name="Adobe Creative Cloud", category="software", price=Decimal("239.88"),
             billing_cycle="yearly", next_renewal_date=in_days(41)),
         sub(id=7, name="Duolingo Super", category="education", price=Decimal("12.99"), is_trial=True,
-            trial_end_date=in_days(3), next_renewal_date=in_days(3), converts_to_paid=True),
+            trial_end_date=in_days(3), next_renewal_date=in_days(3), converts_to_paid=True,
+            trial_start_date=in_days(-4), trial_length_days=7),
         sub(id=8, name="The Economist", category="news", price=Decimal("22.00"), is_trial=True,
-            trial_end_date=in_days(9), next_renewal_date=in_days(9), converts_to_paid=False),
+            trial_end_date=in_days(9), next_renewal_date=in_days(9), converts_to_paid=False,
+            trial_start_date=in_days(-21), trial_length_days=30),
         sub(id=9, name="Disney+", category="streaming", price=Decimal("9.99"), status="paused", next_renewal_date=in_days(15)),
         sub(id=10, name="Hulu", category="streaming", price=Decimal("7.99"), status="cancelled", next_renewal_date=in_days(-20)),
     ]

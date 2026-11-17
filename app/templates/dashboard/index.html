@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "partials/_macros.html" import stat_card, category_icon, days_badge %}
+{% from "partials/_macros.html" import stat_card, category_icon, days_badge, trial_period %}
 
 {% block title %}Dashboard{% endblock %}
 
@@ -107,6 +107,7 @@
                 {% else %}
                   won't charge you
                 {% endif %}
+                {% if t.trial_start_date %}<div>{{ trial_period(t) }}</div>{% endif %}
               </div>
             </div>
           {% else %}

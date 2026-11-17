@@ -116,6 +116,11 @@ class SubscriptionForm(FlaskForm):
         default="monthly",
     )
     next_renewal_date = DateField("Next renewal or trial end date", validators=[InputRequired()])
+    trial_start_date = DateField(
+        "Trial start date (optional)",
+        validators=[Optional()],
+        description="For free trials only. Shows how long the trial runs.",
+    )
     category = SelectField(
         "Category",
         choices=[SelectChoice(key, label) for key, (label, _) in CATEGORIES.items()],
@@ -143,6 +148,13 @@ class SubscriptionForm(FlaskForm):
                 raise ValidationError(f"Enter a whole amount for {self.currency.data}.")
         elif price != price.quantize(Decimal("0.01")):
             raise ValidationError("Enter a price with up to two decimal places.")
+
+    def validate_trial_start_date(self, field):
+        # Ignored for paid subscriptions, so only check it for trials.
+        if self.subscription_type.data == "paid" or field.data is None or self.next_renewal_date.data is None:
+            return
+        if field.data > self.next_renewal_date.data:
+            raise ValidationError("The trial must start on or before the date it ends.")
 
     def validate_cancellation_url(self, field):
         try:

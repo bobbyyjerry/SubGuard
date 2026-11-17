@@ -1,5 +1,5 @@
 {# One subscription card. Expects `sub` (a subscription) and `today`. #}
-{% from "partials/_macros.html" import status_badge, category_badge, category_icon, days_badge %}
+{% from "partials/_macros.html" import status_badge, category_badge, category_icon, days_badge, trial_period %}
 {% set event_date = sub.trial_end_date if sub.is_trial else sub.next_renewal_date %}
 {% set days = (event_date - today).days %}
 {% set is_active = sub.status == "active" %}
@@ -74,6 +74,7 @@
     {% if sub.is_trial %}
       <div class="small text-secondary mb-3">
         {{ "Then converts to paid" if sub.converts_to_paid else "Does not convert to paid" }}
+        {% if sub.trial_start_date %}<div>{{ trial_period(sub) }}</div>{% endif %}
       </div>
     {% else %}
       <div class="small text-secondary mb-3">Estimated · {{ BILLING_CYCLES[sub.billing_cycle][0] }}</div>
