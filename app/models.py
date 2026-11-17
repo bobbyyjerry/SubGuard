@@ -28,7 +28,9 @@ class User(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))
-    preferences: Mapped[UserPreferences | None] = relationship()
+    # Deleting an account removes its preferences and subscriptions with it.
+    preferences: Mapped[UserPreferences | None] = relationship(cascade="all, delete-orphan")
+    subscriptions: Mapped[list["Subscription"]] = relationship(cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -54,7 +56,7 @@ class Subscription(db.Model):
     __table_args__ = {"sqlite_autoincrement": True}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(120))
     price: Mapped[Decimal] = mapped_column(Numeric(9, 2))
     currency: Mapped[str] = mapped_column(String(3))

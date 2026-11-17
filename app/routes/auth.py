@@ -1,13 +1,17 @@
 """Account registration and session routes."""
-from flask import Blueprint, flash, redirect, render_template, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..extensions import db
 from ..forms import LoginForm, RegistrationForm
 from ..models import User
 
 bp = Blueprint("auth", __name__)
+
+# Checked when no account matches, so a wrong email takes as long as a wrong password.
+_UNUSED_HASH = generate_password_hash("no account uses this")
 
 
 def _find_user(email):
@@ -47,11 +51,20 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
+        throttle = current_app.extensions["login_throttle"]
+        attempt = (request.remote_addr, form.email.data)
+        if throttle.is_blocked(attempt):
+            flash("Too many failed attempts. Wait 15 minutes and try again.", "error")
+            return render_template("auth/form.html", form=form, is_registration=False), 429
+
         user = _find_user(form.email.data)
-        if user is not None and user.check_password(form.password.data):
+        password_hash = user.password_hash if user is not None else _UNUSED_HASH
+        if check_password_hash(password_hash, form.password.data) and user is not None:
+            throttle.reset(attempt)
             session.clear()
             login_user(user)
             return redirect(url_for("dashboard.index"))
+        throttle.record_failure(attempt)
         flash("The email address or password is incorrect.", "error")
 
     return render_template("auth/form.html", form=form, is_registration=False)

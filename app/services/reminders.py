@@ -36,7 +36,12 @@ def _message(subscription, email, sender):
         event = f"{subscription.name} renews on {event_date}."
         charge = f"Expected charge: {amount}."
 
-    message.set_content(f"{event}\n{charge}\n\nOpen SubGuard to review the subscription details.\n")
+    lines = [event, charge, ""]
+    if subscription.cancellation_url:
+        # The link the user saved themselves; SubGuard never cancels anything.
+        lines += [f"To cancel, use the link you saved: {subscription.cancellation_url}", ""]
+    lines.append("Open SubGuard to review the subscription details.")
+    message.set_content("\n".join(lines) + "\n")
     return message
 
 

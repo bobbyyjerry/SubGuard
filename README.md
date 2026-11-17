@@ -47,6 +47,10 @@ The database records each handoff. The worker retries messages that SMTP definit
 pytest
 ```
 
+## Security
+
+See [SECURITY.md](SECURITY.md) for what protects accounts and data, the known limits, and the steps to take before going live.
+
 ## Tech stack
 
 Flask · Flask-SQLAlchemy · SQLite · Flask-Login · Flask-WTF · Bootstrap 5 · Chart.js · APScheduler · Pytest

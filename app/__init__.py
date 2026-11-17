@@ -14,6 +14,10 @@ from .config import config_by_name
 from .extensions import csrf, db, login_manager
 
 
+# Example values that must never protect a live site.
+PLACEHOLDER_SECRET_KEYS = {"change-me-to-a-long-random-string", "test-secret-key"}
+
+
 def create_app(config_name=None):
     config_name = config_name or os.environ.get("FLASK_CONFIG", "development")
     if config_name not in config_by_name:
@@ -25,6 +29,8 @@ def create_app(config_name=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_by_name[config_name])
 
+    if config_name == "production" and app.config.get("SECRET_KEY") in PLACEHOLDER_SECRET_KEYS:
+        raise RuntimeError("SECRET_KEY is still the example value. Generate a new one for production.")
     if not app.config.get("SECRET_KEY"):
         raise RuntimeError(
             "SECRET_KEY is not set. Copy .env.example to .env and set SECRET_KEY."
@@ -82,7 +88,17 @@ def create_app(config_name=None):
             if name not in existing:
                 with db.engine.begin() as connection:
                     connection.execute(db.text(f"ALTER TABLE {table} ADD COLUMN {name} {column_type}"))
+        # Older databases can hold reminder records for subscriptions that were deleted.
+        with db.engine.begin() as connection:
+            connection.execute(db.text(
+                "DELETE FROM reminder_deliveries WHERE subscription_id NOT IN (SELECT id FROM subscriptions)"
+            ))
         click.echo("Database tables are ready.")
+
+    # Security headers on every response and the failed-login limit.
+    from .security import register_security
+
+    register_security(app)
 
     # Friendly 404 / 500 pages.
     from .errors import register_error_handlers

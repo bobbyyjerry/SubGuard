@@ -21,6 +21,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = True
+    SESSION_COOKIE_HTTPONLY = True  # JavaScript can't read the session cookie
+    SESSION_COOKIE_SAMESITE = "Lax"  # not sent with requests made by other sites
+    MAX_CONTENT_LENGTH = 1024 * 1024  # refuse request bodies over 1 MB
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_PORT = os.environ.get("MAIL_PORT")
     MAIL_SECURITY = os.environ.get("MAIL_SECURITY", "starttls")
@@ -44,8 +47,6 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     SESSION_COOKIE_SECURE = True  # cookies only sent over HTTPS
-    SESSION_COOKIE_HTTPONLY = True  # JavaScript can't read the session cookie
-    SESSION_COOKIE_SAMESITE = "Lax"
 
 
 config_by_name = {
