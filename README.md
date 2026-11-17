@@ -37,7 +37,7 @@ It never connects to a bank and never takes payments. You type in your subscript
 
 ## Screenshots
 
-The screenshots use made-up services and prices.
+The screenshots show the sky blue and apricot theme and use made-up services and prices.
 
 | Home page | Subscriptions |
 | --- | --- |
