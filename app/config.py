@@ -31,6 +31,8 @@ class Config:
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
     REMINDER_DAYS = os.environ.get("REMINDER_DAYS", "3")
+    # Optional. Lets an outside scheduler send reminders (see routes/tasks.py).
+    REMINDER_TRIGGER_TOKEN = os.environ.get("REMINDER_TRIGGER_TOKEN")
 
 
 class DevelopmentConfig(Config):

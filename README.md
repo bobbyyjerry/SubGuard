@@ -16,6 +16,7 @@ It never connects to a bank and never takes payments. You type in your subscript
 - [How it is built](#how-it-is-built)
 - [Run it locally](#run-it-locally)
 - [Email reminders](#email-reminders)
+- [Deployment](#deployment)
 - [Tests](#tests)
 - [Security](#security)
 - [Known limits](#known-limits)
@@ -69,13 +70,15 @@ SubGuard/
 │   ├── security.py        Security headers and the failed-login limit
 │   ├── reminder_cli.py    `flask reminders` command
 │   ├── routes/            One file per area: auth, dashboard, subscriptions,
-│   │                      analytics, calendar, settings
+│   │                      analytics, calendar, settings, tasks
 │   ├── services/          Logic with no web code: billing totals, renewal
 │   │                      dates, reminders, email, time zones
 │   ├── templates/         Jinja2 pages and shared partials
 │   └── static/            CSS, JavaScript and the icon
 ├── tests/                 Pytest tests
 ├── docs/screenshots/      Images used in this README
+├── .github/workflows/     Daily GitHub job that triggers the reminders
+├── DEPLOYMENT.md          How to put it online
 ├── SECURITY.md            Security checklist
 └── wsgi.py                Entry point for `flask run` and for hosting
 ```
@@ -139,13 +142,19 @@ flask reminders --once
 
 If the email server clearly rejects a message, the worker retries it later. If it cannot tell whether a message was delivered, it logs it for review instead of risking a duplicate.
 
+## Deployment
+
+[DEPLOYMENT.md](DEPLOYMENT.md) is a step-by-step guide to putting SubGuard online on PythonAnywhere's free plan.
+
+That plan has no scheduler, so the reminder worker cannot run there. Instead, a daily GitHub Actions job (`.github/workflows/reminders.yml`) calls a secret-protected address on the site, `POST /tasks/reminders`, which sends whatever is due. The address does not exist unless `REMINDER_TRIGGER_TOKEN` is set, and it only answers a caller that sends the same token.
+
 ## Tests
 
 ```powershell
 pytest
 ```
 
-There are 105 tests. They cover accounts, subscriptions, renewal dates, billing totals, reminders, the calendar, analytics, settings and the security rules. Tests use a throwaway in-memory database, so they never touch your data.
+There are 110 tests. They cover accounts, subscriptions, renewal dates, billing totals, reminders, the calendar, analytics, settings and the security rules. Tests use a throwaway in-memory database, so they never touch your data.
 
 ## Security
 

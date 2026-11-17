@@ -1,0 +1,34 @@
+# Sends SubGuard's reminder emails once a day.
+#
+# The free PythonAnywhere plan has no scheduler, so GitHub calls the site's
+# secret-protected reminder address instead. Two repository secrets are needed
+# (Settings > Secrets and variables > Actions):
+#   SUBGUARD_URL            e.g. https://yourname.pythonanywhere.com
+#   REMINDER_TRIGGER_TOKEN  the same value as in the server's .env file
+name: Daily reminders
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # every day at 06:17 UTC
+  workflow_dispatch:        # lets you run it by hand from the Actions tab
+
+permissions: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ask SubGuard to send due reminders
+        env:
+          SUBGUARD_URL: ${{ secrets.SUBGUARD_URL }}
+          REMINDER_TRIGGER_TOKEN: ${{ secrets.REMINDER_TRIGGER_TOKEN }}
+        run: |
+          if [ -z "$SUBGUARD_URL" ] || [ -z "$REMINDER_TRIGGER_TOKEN" ]; then
+            echo "Set the SUBGUARD_URL and REMINDER_TRIGGER_TOKEN repository secrets first."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --max-time 120 \
+            --retry 2 --retry-delay 30 \
+            -X POST -H "Authorization: Bearer $REMINDER_TRIGGER_TOKEN" \
+            "${SUBGUARD_URL%/}/tasks/reminders"
