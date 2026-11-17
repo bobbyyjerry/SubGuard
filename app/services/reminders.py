@@ -115,11 +115,11 @@ def send_due_reminders(settings, lead_days, *, now=None):
             db.session.commit()
             current_app.logger.warning(
                 "Reminder %s on %s was rejected (%s) and can retry.",
-                subscription_id, event_date, type(error.__cause__).__name__,
+                subscription_id, event_date, str(error) or type(error.__cause__).__name__,
             )
             failed += 1
         except MailUnconfirmed:
-            current_app.logger.warning("Reminder %s on %s has an unconfirmed SMTP handoff.", subscription_id, event_date)
+            current_app.logger.warning("Reminder %s on %s has an unconfirmed email handoff.", subscription_id, event_date)
             failed += 1
         else:
             db.session.execute(db.update(ReminderDelivery).where(*filters).values(sent_at=datetime.now(timezone.utc)))

@@ -9,7 +9,7 @@ from sqlalchemy import inspect
 
 from .extensions import db
 from .models import ReminderDelivery, UserPreferences
-from .services.mail import MailSettings
+from .services.mail import mail_settings_from_config
 from .services.reminders import send_due_reminders
 
 
@@ -27,7 +27,7 @@ def reminders_command(once):
     """Run the email reminder worker."""
     app = current_app._get_current_object()
     try:
-        settings = MailSettings.from_config(app.config)
+        settings = mail_settings_from_config(app.config)
     except ValueError as error:
         raise click.ClickException(str(error)) from None
     try:

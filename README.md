@@ -55,7 +55,7 @@ The screenshots show the sky blue and apricot theme and use made-up services and
 | Backend | Python 3, Flask, Flask-Login, Flask-WTF |
 | Database | SQLite through Flask-SQLAlchemy (SQLAlchemy 2) |
 | Frontend | HTML, CSS, JavaScript, Bootstrap 5, Chart.js |
-| Reminders | APScheduler and SMTP email from Python's standard library |
+| Reminders | APScheduler with SMTP or the Brevo HTTPS email API |
 | Tests | Pytest |
 
 ## How it is built
@@ -124,6 +124,8 @@ The database is a single file, `instance/subguard.db`. Run `flask init-db` again
 
 Reminders are sent by a separate worker, so the website stays fast and the two can be restarted independently.
 
+On PythonAnywhere, the [Brevo HTTPS option](DEPLOYMENT.md#brevo-https-email-if-gmail-smtp-disconnects) is available if Gmail SMTP disconnects.
+
 1. In `.env`, set `MAIL_SERVER` and `MAIL_DEFAULT_SENDER` using your email provider's SMTP settings. Set `MAIL_USERNAME` and `MAIL_PASSWORD` if the provider needs a login.
 2. The default is STARTTLS on port 587. Use `MAIL_SECURITY=ssl` for port 465, or `MAIL_SECURITY=none` for a local test server with no login.
 3. Start the worker in its own terminal, next to the web app:
@@ -154,7 +156,7 @@ That plan has no scheduler, so the reminder worker cannot run there. Instead, a 
 pytest
 ```
 
-There are 110 tests. They cover accounts, subscriptions, renewal dates, billing totals, reminders, the calendar, analytics, settings and the security rules. Tests use a throwaway in-memory database, so they never touch your data.
+There are 118 tests. They cover accounts, subscriptions, renewal dates, billing totals, reminders, the calendar, analytics, settings and the security rules. Tests use a throwaway in-memory database, so they never touch your data.
 
 ## Security
 

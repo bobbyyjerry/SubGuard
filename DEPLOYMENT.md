@@ -66,6 +66,20 @@ A Gmail **app password** is a 16-letter password made for one app. Create it at 
 
 You can leave the `MAIL_` lines out for now. The site works without them; it just sends no emails.
 
+### Brevo HTTPS email if Gmail SMTP disconnects
+
+Verify a sender in Brevo and create an API key for sending transactional email. PythonAnywhere allowlists `api.brevo.com` on free accounts. [PythonAnywhere allowlist](https://www.pythonanywhere.com/whitelist/) · [Brevo sender setup](https://help.brevo.com/hc/en-us/articles/208836149-Create-a-new-sender-From-name-and-From-email) · [Brevo API keys](https://help.brevo.com/hc/en-us/articles/209467485-Create-and-manage-your-API-keys)
+
+Set these values in the hosted `.env`, using the sender address you verified in Brevo.
+
+```dotenv
+MAIL_TRANSPORT=brevo
+MAIL_DEFAULT_SENDER="SubGuard <you@example.com>"
+BREVO_API_KEY=your-brevo-api-key
+```
+
+After initializing the database, add an active test subscription due tomorrow and run `python -m flask --app wsgi reminders --once` in the `subguard` virtual environment. Check the inbox for the email address on your SubGuard account. Reload the web app before testing the scheduled workflow.
+
 ## 4. Create the database
 
 ```bash

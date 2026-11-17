@@ -10,7 +10,7 @@ import hmac
 from flask import Blueprint, abort, current_app, jsonify, request
 
 from ..extensions import csrf
-from ..services.mail import MailSettings
+from ..services.mail import mail_settings_from_config
 from ..services.reminders import send_due_reminders
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -30,7 +30,7 @@ def run_reminders():
         abort(403)
 
     try:
-        settings = MailSettings.from_config(current_app.config)
+        settings = mail_settings_from_config(current_app.config)
         lead_days = int(current_app.config["REMINDER_DAYS"])
         if not 1 <= lead_days <= 30:
             raise ValueError

@@ -24,12 +24,14 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True  # JavaScript can't read the session cookie
     SESSION_COOKIE_SAMESITE = "Lax"  # not sent with requests made by other sites
     MAX_CONTENT_LENGTH = 1024 * 1024  # refuse request bodies over 1 MB
+    MAIL_TRANSPORT = os.environ.get("MAIL_TRANSPORT", "smtp")
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_PORT = os.environ.get("MAIL_PORT")
     MAIL_SECURITY = os.environ.get("MAIL_SECURITY", "starttls")
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+    BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
     REMINDER_DAYS = os.environ.get("REMINDER_DAYS", "3")
     # Optional. Lets an outside scheduler send reminders (see routes/tasks.py).
     REMINDER_TRIGGER_TOKEN = os.environ.get("REMINDER_TRIGGER_TOKEN")
@@ -42,6 +44,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SECRET_KEY = "test-secret-key"  # a fake key, only used by pytest
+    MAIL_TRANSPORT = "smtp"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"  # throwaway in-memory database
     WTF_CSRF_ENABLED = False  # lets tests submit forms without a token
 
