@@ -41,7 +41,7 @@
               <span class="fw-bold">$15.49</span>
             </div>
           </div>
-          <div class="card w-100">
+          <div class="card w-100 hero-preview-trial">
             <div class="card-body d-flex gap-3 align-items-center">
               {{ category_icon("education") }}
               <div class="flex-grow-1">
@@ -128,9 +128,9 @@
         <p class="mb-0 opacity-75">Free to use. Set up in under five minutes.</p>
       </div>
       {% if current_user.is_authenticated %}
-        <a href="{{ url_for('dashboard.index') }}" class="btn btn-light btn-lg text-primary fw-semibold">Open dashboard</a>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-light btn-lg fw-semibold">Open dashboard</a>
       {% else %}
-        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg text-primary fw-semibold">Create your account</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg fw-semibold">Create your account</a>
       {% endif %}
     </div>
   </div>

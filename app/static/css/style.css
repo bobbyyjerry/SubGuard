@@ -1,53 +1,58 @@
-/* SubGuard's charcoal and plum palette extends Bootstrap's dark theme. */
+/* SubGuard's sky blue and apricot palette extends Bootstrap's dark theme. */
 
 :root,
 :root[data-bs-theme="dark"] {
   color-scheme: dark;
 
-  --sg-primary-rgb: 188, 147, 173;
+  --sg-primary-rgb: 149, 189, 223;
   --sg-primary: rgb(var(--sg-primary-rgb));
-  --sg-primary-hover-rgb: 208, 173, 196;
+  --sg-primary-hover-rgb: 178, 210, 236;
   --sg-primary-hover: rgb(var(--sg-primary-hover-rgb));
-  --sg-primary-deep: #302234;
-  --sg-primary-fill: #58384f;
-  --sg-primary-fill-hover: #694760;
-  --sg-primary-soft: #352733;
-  --sg-primary-line: #90657f;
+  --sg-primary-deep: #233543;
+  --sg-primary-fill: #31516b;
+  --sg-primary-fill-hover: #3b617d;
+  --sg-primary-soft: #253745;
+  --sg-primary-line: #6688a4;
   --sg-focus: rgba(var(--sg-primary-rgb), 0.24);
-  --sg-on-primary: #eee4ec;
+  --sg-on-primary: #edf4fa;
 
-  --sg-bg-rgb: 23, 20, 25;
+  --sg-accent-rgb: 208, 162, 135;
+  --sg-accent: rgb(var(--sg-accent-rgb));
+  --sg-accent-soft: #392c27;
+  --sg-accent-line: #997362;
+
+  --sg-bg-rgb: 23, 26, 30;
   --sg-bg: rgb(var(--sg-bg-rgb));
-  --sg-bg-deep: #120f14;
-  --sg-surface: #211c24;
-  --sg-surface-2: #2b242e;
-  --sg-input-bg: #1c181f;
-  --sg-input-border: #827483;
-  --sg-border: #413644;
-  --sg-text: #d6cbd4;
-  --sg-muted: #b0a0ae;
-  --sg-heading: #e7dce6;
+  --sg-bg-deep: #121518;
+  --sg-surface: #20252b;
+  --sg-surface-2: #282f37;
+  --sg-input-bg: #1b2026;
+  --sg-input-border: #758493;
+  --sg-border: #39454f;
+  --sg-text: #d4dce5;
+  --sg-muted: #a5b2bf;
+  --sg-heading: #e7edf4;
 
   --sg-success: #9cb69f;
   --sg-success-soft: #25332c;
-  --sg-warning: #c0a378;
-  --sg-warning-soft: #382f23;
+  --sg-warning: var(--sg-accent);
+  --sg-warning-soft: var(--sg-accent-soft);
   --sg-danger: #d09aa5;
   --sg-danger-soft: #382730;
 
   --sg-radius: 0.875rem;
-  --sg-shadow: 0 2px 4px rgba(10, 7, 11, 0.22), 0 8px 24px rgba(10, 7, 11, 0.21);
+  --sg-shadow: 0 2px 4px rgba(9, 13, 17, 0.23), 0 8px 24px rgba(9, 13, 17, 0.22);
 
   --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --bs-body-bg: var(--sg-bg);
   --bs-body-bg-rgb: var(--sg-bg-rgb);
   --bs-body-color: var(--sg-text);
-  --bs-body-color-rgb: 214, 203, 212;
+  --bs-body-color-rgb: 212, 220, 229;
   --bs-emphasis-color: var(--sg-heading);
-  --bs-emphasis-color-rgb: 231, 220, 230;
+  --bs-emphasis-color-rgb: 231, 237, 244;
   --bs-heading-color: var(--sg-heading);
   --bs-secondary-color: var(--sg-muted);
-  --bs-secondary-rgb: 176, 160, 174;
+  --bs-secondary-rgb: 165, 178, 191;
   --bs-secondary-bg: var(--sg-surface-2);
   --bs-tertiary-bg: var(--sg-surface);
   --bs-border-color: var(--sg-border);
@@ -63,7 +68,7 @@
   --bs-info-bg-subtle: var(--sg-primary-soft);
   --bs-info-border-subtle: var(--sg-primary-line);
   --bs-success-rgb: 156, 182, 159;
-  --bs-warning-rgb: 192, 163, 120;
+  --bs-warning-rgb: var(--sg-accent-rgb);
   --bs-danger-rgb: 208, 154, 165;
   --bs-success-text-emphasis: var(--sg-success);
   --bs-warning-text-emphasis: var(--sg-warning);
@@ -72,7 +77,7 @@
   --bs-warning-bg-subtle: var(--sg-warning-soft);
   --bs-danger-bg-subtle: var(--sg-danger-soft);
   --bs-success-border-subtle: #475e4c;
-  --bs-warning-border-subtle: #6c593e;
+  --bs-warning-border-subtle: var(--sg-accent-line);
   --bs-danger-border-subtle: #6f4b57;
   --bs-form-invalid-color: var(--sg-danger);
   --bs-form-invalid-border-color: var(--sg-danger);
@@ -394,8 +399,8 @@ body {
 /* ---------- Landing page ---------- */
 .hero {
   background:
-    radial-gradient(55rem 34rem at 89% 8%, #302333, transparent 74%),
-    radial-gradient(40rem 25rem at -5% 110%, #241e27, transparent 72%),
+    radial-gradient(55rem 34rem at 89% 8%, rgba(var(--sg-primary-rgb), 0.15), transparent 74%),
+    radial-gradient(40rem 25rem at -5% 110%, rgba(var(--sg-accent-rgb), 0.13), transparent 72%),
     var(--sg-bg);
 }
 
@@ -404,6 +409,10 @@ body {
 .hero-preview .card { max-width: 24rem; text-align: left; }
 .hero-preview .card + .card { margin-top: 0.75rem; }
 .hero-preview .card:first-child { --bs-card-border-color: var(--sg-primary-line); }
+.hero-preview-trial .icon-circle {
+  background: var(--sg-accent-soft);
+  color: var(--sg-accent);
+}
 
 .feature-icon {
   display: inline-grid;
@@ -429,14 +438,23 @@ body {
 
 .cta-band {
   --bs-heading-color: var(--sg-on-primary);
-  background: linear-gradient(120deg, var(--sg-primary-deep), var(--sg-primary-fill));
+  background:
+    radial-gradient(34rem 14rem at 100% 15%, rgba(var(--sg-accent-rgb), 0.15), transparent 75%),
+    linear-gradient(110deg, var(--sg-primary-deep), var(--sg-surface-2));
   color: var(--sg-on-primary);
+  border: 1px solid var(--sg-border);
   border-radius: var(--sg-radius);
   box-shadow: var(--sg-shadow);
 }
 .cta-band .btn-light {
-  --bs-btn-bg: var(--sg-surface);
-  --bs-btn-border-color: var(--sg-surface);
+  --bs-btn-color: var(--sg-accent);
+  --bs-btn-bg: var(--sg-accent-soft);
+  --bs-btn-border-color: var(--sg-accent-line);
+  --bs-btn-hover-bg: #46352e;
+  --bs-btn-hover-border-color: var(--sg-accent);
+  --bs-btn-active-bg: #46352e;
+  --bs-btn-active-border-color: var(--sg-accent);
+  --bs-btn-focus-shadow-rgb: var(--sg-accent-rgb);
 }
 
 /* ---------- Footer ---------- */

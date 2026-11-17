@@ -12,14 +12,14 @@ function renderSpendingCharts() {
   const textColor = themeColor("--sg-text");
   const categoryColors = {
     streaming: themeColor("--sg-primary"),
-    music: "#a7806f",
-    software: "#7c8da5",
-    cloud: "#789b8e",
-    gaming: "#a87985",
-    news: "#a48c65",
-    fitness: "#89986e",
-    education: "#9683a8",
-    other: "#918790",
+    music: themeColor("--sg-accent"),
+    software: "#a396ba",
+    cloud: "#78a79c",
+    gaming: "#bc91aa",
+    news: "#c1ac78",
+    fitness: "#9cac78",
+    education: "#829abb",
+    other: "#9ca4ae",
   };
   const labels = categories.map(({ label }) => label);
   const backgroundColor = categories.map(({ key }) => categoryColors[key]);
